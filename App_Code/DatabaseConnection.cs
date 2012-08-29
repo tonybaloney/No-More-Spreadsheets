@@ -59,6 +59,13 @@ namespace com.ashaw.pricing
             return result;
         }
 
+        /// <summary>
+        /// Ss the proc to object list.
+        /// </summary>
+        /// <param name="resultType">Type of the result.</param>
+        /// <param name="sProcName">Name of the s proc.</param>
+        /// <param name="sProcParams">The s proc params.</param>
+        /// <returns></returns>
         public List<object> SProcToObjectList ( Type resultType, string sProcName, params KeyValuePair<string,object>[] sProcParams ) {
             List<object> results = new List<object>();
 
@@ -123,6 +130,27 @@ namespace com.ashaw.pricing
             command.Dispose();
 
             return command.Parameters["@Ret"].Value;
+        }
+        /// <summary>
+        /// Ss the proc.
+        /// </summary>
+        /// <param name="sProcName">Name of the s proc.</param>
+        /// <param name="sProcParams">The s proc params.</param>
+        public void SProc(string sProcName, params KeyValuePair<string, object>[] sProcParams)
+        {
+            // Call the stored procedure with the parameters.
+            SqlCommand command = new SqlCommand();
+            command.Connection = this.sqlConnection;
+            command.Connection.Open();
+            foreach (KeyValuePair<string, object> kvp in sProcParams)
+            {
+                command.Parameters.Add(new SqlParameter(kvp.Key, kvp.Value));
+            }
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandText = sProcName;
+            command.ExecuteScalar();
+            command.Connection.Close();
+            command.Dispose();
         }
     }
 }

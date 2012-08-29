@@ -7,18 +7,17 @@
 <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Pricelists" ></script>
 <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Users" ></script>
 <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Quotes" ></script>
-<script type="text/javascript" src="pricing/js/Renderers.js"></script>
 <script type="text/javascript">
     Ext.onReady(function(){
         function WithDiscount (val, rec,c ) {
             var total = parseFloat(c.data.q_totalvalue) * (1-parseFloat(c.data.q_discount_percent)/100) - parseFloat(c.data.q_discount_writein) ;
-            return ukMoney (total);
+            return Ext.util.Format.currency (total);
         }
         function CustomerName (val) {
             return '<span><a href="javascript:alert(\'to salesforce\')">'+val+'</a></span>';
         }
         function GetSelectedQuote(){
-            return grid.selModel.selected.items[0].data.q_id;
+            return grid.selModel.selected.items[0].data.Id;
         }
         function RenewQuote(){
             Ext.Msg.show({
@@ -27,7 +26,14 @@
                 buttons: Ext.Msg.OKCANCEL,
                 fn: function(e){
                     if (e=='ok')
-                        window.location = 'quote.php?mode=renew&quoteid=';
+                        Ext.Ajax.request({
+                            url: 'QuoteService.svc/RenewQuote',
+                            jsonData: {
+                                QuoteId: GetSelectedQuote()
+                            },
+                            success: function () { Ext.getStore('QuotesStore').load(); },
+                            failure: function () { alert('Error closing quote'); }
+                        });
                 },
                 icon: Ext.MessageBox.QUESTION
             });
@@ -40,7 +46,10 @@
                 fn: function(e){
                     if (e=='ok') {
                         Ext.Ajax.request({
-                            url: 'quote.php?mode=close&quoteid='+GetSelectedQuote(),
+                            url: 'QuoteService.svc/CloseQuote',
+                            jsonData: {
+                                QuoteId: GetSelectedQuote()
+                            },
                             success: function() {Ext.getStore('QuotesStore').load();} ,
                             failure: function() { alert('Error closing quote'); }
                         });
@@ -50,23 +59,6 @@
             });
         }
 
-        function DeleteQuote(){
-            Ext.Msg.show({
-                title:'Delete quote?',
-                msg: 'Are you sure you wish to delete the selected quote(s)?',
-                buttons: Ext.Msg.OKCANCEL,
-                fn: function(e){
-                    if (e=='ok') {
-                        Ext.Ajax.request({
-                            url: 'quote.php?mode=close&delete=yes&quoteid='+GetSelectedQuote(),
-                            success: function() {Ext.getStore('QuotesStore').load();} ,
-                            failure: function() { alert('Error deleting quote'); }
-                        });
-                    }
-                },
-                icon: Ext.MessageBox.QUESTION
-            });
-        }
         function MakeTemplate(){
             Ext.Msg.show({
                 title:'Make template quote?',
@@ -75,7 +67,10 @@
                 fn: function(e){
                     if (e=='ok') {
                         Ext.Ajax.request({
-                            url: 'quote.php?mode=close&opt=template&quoteid='+GetSelectedQuote(),
+                            url: 'QuoteService.svc/MakeQuoteTemplate',
+                            jsonData: {
+                                QuoteId: GetSelectedQuote()
+                            },
                             success: function() {Ext.getStore('QuotesStore').load();} ,
                             failure: function() { alert('Error closing quote'); }
                         });
@@ -116,8 +111,12 @@
                         var new_id = this.ownerCt.ownerCt.form.items[0].value  ;
                         if (new_id){
                             Ext.Ajax.request({
-                                url: 'pricing/data.php?type=assign&user='+new_id+'&quoteid='+GetSelectedQuote(),
-                                success: function() {Ext.getStore('QuotesStore').load();} ,
+                                url: 'QuoteService.svc/AssignQuote',
+                                jsonData: {
+                                    QuoteId: GetSelectedQuote(),
+                                    newUserId : new_id
+                                },
+                                success: function () { Ext.getStore('QuotesStore').load(); },
                                 failure: function() { alert('Error assigning quote'); }
                             });
                             this.ownerCt.ownerCt.ownerCt.hide();
@@ -216,7 +215,7 @@
             forceFit: true,
             store: 'QuotesStore',
             columns: [
-				{id:'q_id',header: 'ID', width: 50, sortable: true, dataIndex: 'q_id'},
+				{id:'Id',header: 'ID', width: 50, sortable: true, dataIndex: 'Id'},
 				{header: 'Customer', width: 320, sortable: true, dataIndex: 'q_customer_name', renderer:CustomerName, flex:1},
 				{id:'q_title',header: 'Title', width: 75, sortable: true,  dataIndex: 'q_title', flex:2},
 				{header: 'Owner', width: 150, sortable: true, dataIndex: 'q_ownername' },
@@ -227,20 +226,20 @@
             ],
             listeners : { 
                 itemdblclick :function( ){
-                    window.location = 'quote.php?mode=edit&quoteid='+GetSelectedQuote();
+                    window.location = 'ViewQuote.aspx?QuoteId='+GetSelectedQuote();
                 }
             },
             tbar: new Ext.Toolbar({
                 enableOverflow: true,
                 items: [
                         { xtype:'button', text:'Create Quote', handler: function () {CreateQuote();} , iconCls:'icon-fugue-money-coin'},
-                        { xtype:'button', text:'Edit Quote', handler: function () { window.location = 'quote.php?mode=edit&quoteid='+GetSelectedQuote();} , iconCls:'icon-fugue-document-text'},
+                        { xtype:'button', text:'Edit Quote', handler: function () { window.location = 'ViewQuote.aspx?QuoteId='+GetSelectedQuote();} , iconCls:'icon-fugue-document-text'},
                         { xtype:'button', text:'Use as template', handler: function () { CreateQuote(GetSelectedQuote());} , iconCls:'icon-fugue-documents'},
                         //{ xtype:'button', text:'Renew Quote', handler: RenewQuote , iconCls:'icon-fugue-arrow-circle'},
                         { xtype:'button', text:'Make Template', handler: MakeTemplate , iconCls:'icon-fugue-script-block'},
                         { xtype: 'tbfill' },
                         { xtype:'button', text: 'Assign', handler : AssignQuote, iconCls:'icon-fugue-user'},
-                        { xtype:'button', text:'Print PDF', handler: function () { window.location = 'quote.php?mode=print&format=pdf&quoteid='+GetSelectedQuote();} , iconCls:'icon-fugue-document-pdf'},
+                        { xtype:'button', text:'Print PDF', handler: function () { window.location = 'PrintQuote.aspx?QuoteId='+GetSelectedQuote();} , iconCls:'icon-fugue-document-pdf'},
                         { xtype:'button', text:'Close Quote', handler: CloseQuote , iconCls:'icon-fugue-door'},
                         'Search:',
                         {xtype:'textfield', width:200, id:'search-field', listeners: { specialkey: function(f,e){ if (e.getKey() == e.ENTER) { Ext.data.StoreManager.lookup('QuotesStore').load( {params: {viewOpt:'search', searchString:Ext.getCmp('search-field').getValue()} }); } } } },

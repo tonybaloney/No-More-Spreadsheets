@@ -5,9 +5,23 @@ namespace com.ashaw.pricing
     /// <summary>
     /// Summary description for QuoteItem
     /// </summary>
-    public class QuoteItem
+    public class QuoteItem : DataObject
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuoteItem" /> class.
+        /// </summary>
         public QuoteItem() {}
+
+        /// <summary>
+        /// Creates this instance.
+        /// </summary>
+        public void Create()
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            System.Data.SqlClient.SqlCommand com = new System.Data.SqlClient.SqlCommand(this.GetInsertSQL("QuoteItems"));
+            db.RunScalarCommand(com);
+            db.Dispose();
+        }
 
         /// <summary>
         /// Gets or sets the id.
@@ -15,7 +29,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The id.
         /// </value>
-        [DataField("Id", "qi_id", "")]
+        [DataField("Id")]
         public int Id { get; set; }
 
         /// <summary>
@@ -24,7 +38,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The quote id.
         /// </value>
-        [DataField("QuoteId", "quote_id", "")]
+        [DataField("QuoteId")]
         public int QuoteId { get; set; }
 
         /// <summary>
@@ -33,7 +47,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The pricing item id.
         /// </value>
-        [DataField("ProductId", "pi_id", "")]
+        [DataField("ProductId")]
         public int ProductId { get; set; }
 
         /// <summary>
@@ -42,7 +56,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The description.
         /// </value>
-        [DataField("Description", "qi_description", "")]
+        [DataField("Description")]
         public string Description { get; set; }
 
         /// <summary>
@@ -51,7 +65,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The quantity.
         /// </value>
-        [DataField("Quantity", "qi_quantity", "")]
+        [DataField("Quantity")]
         public int Quantity { get; set; }
 
         /// <summary>
@@ -60,7 +74,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The recurring price.
         /// </value>
-        [DataField("RecurringPrice", "qi_recurringprice", "")]
+        [DataField("RecurringPrice")]
         public double RecurringPrice { get; set; }
 
         /// <summary>
@@ -69,7 +83,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The setup price.
         /// </value>
-        [DataField("SetupPrice", "qi_setupprice", "")]
+        [DataField("SetupPrice")]
         public double SetupPrice { get; set; }
 
         /// <summary>
@@ -78,7 +92,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The setup cost.
         /// </value>
-        [DataField("SetupCost", "qi_setupcost", "")]
+        [DataField("SetupCost")]
         public double SetupCost { get; set; }
 
         /// <summary>
@@ -87,7 +101,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The recurring cost.
         /// </value>
-        [DataField("RecurringCost", "qi_recurringcost", "")]
+        [DataField("RecurringCost")]
         public double RecurringCost { get; set; }
 
         /// <summary>
@@ -96,7 +110,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The total setup price.
         /// </value>
-        [DataField("TotalSetupPrice", "qi_totalsetupprice", "")]
+        [DataField("TotalSetupPrice")]
         public double TotalSetupPrice { get; set; }
 
         /// <summary>
@@ -105,7 +119,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The total recurring price.
         /// </value>
-        [DataField("TotalRecurringPrice", "qi_totalrecurringprice", "")]
+        [DataField("TotalRecurringPrice")]
         public double TotalRecurringPrice { get; set; }
 
         /// <summary>
@@ -114,7 +128,7 @@ namespace com.ashaw.pricing
         /// <value>
         ///   <c>true</c> if this instance is bundle; otherwise, <c>false</c>.
         /// </value>
-        [DataField("IsBundle", "qi_isbundle", "")]
+        [DataField("IsBundle")]
         public bool IsBundle { get; set; }
 
         /// <summary>
@@ -123,7 +137,7 @@ namespace com.ashaw.pricing
         /// <value>
         ///   <c>true</c> if this instance is part; otherwise, <c>false</c>.
         /// </value>
-        [DataField("IsPart", "qi_ispart", "")]
+        [DataField("IsPart")]
         public bool IsPart { get; set; }
 
         /// <summary>
@@ -132,7 +146,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The bundle id.
         /// </value>
-        [DataField("BundleId", "qi_bundleid", "")]
+        [DataField("BundleId")]
         public int BundleId { get; set; }
 
         /// <summary>
@@ -141,7 +155,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The name of the group.
         /// </value>
-        [DataField("GroupName", "qi_groupname", "")]
+        [DataField("GroupName")]
         public string GroupName { get; set; }
 
         /// <summary>
@@ -150,8 +164,8 @@ namespace com.ashaw.pricing
         /// <value>
         /// The sub group.
         /// </value>
-        [DataField("SubGroup", "qi_subgroup", "")]
-        public string SubGroup { get; set; }
+        [DataField("SubGroupName")]
+        public string SubGroupName { get; set; }
 
         /// <summary>
         /// Gets or sets the index.
@@ -159,7 +173,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The index.
         /// </value>
-        [DataField("Index", "qi_index", "")]
+        [DataField("Index")]
         public int Index { get; set; }
 
         /// <summary>
@@ -168,7 +182,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The partcode.
         /// </value>
-        [DataField("Partcode", "qi_partcode", "")]
+        [DataField("Partcode")]
         public string Partcode { get; set; }
 
         /// <summary>
@@ -177,7 +191,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The notes.
         /// </value>
-        [DataField("Notes", "qi_notes", "")]
+        [DataField("Notes")]
         public string Notes { get; set; }
 
         /// <summary>
@@ -186,7 +200,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The title.
         /// </value>
-        [DataField("Title", "qi_title", "")]
+        [DataField("Title")]
         public string Title { get; set; }
     }
 }

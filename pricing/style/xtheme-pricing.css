@@ -1,0 +1,28 @@
+/** 
+ * Example stylesheet for EXTJS
+ *
+*/
+.x-panel-header { 
+	font-family: arial ; 
+	background-image: none;
+	background-color: #D00022;
+	color: white;
+}
+.x-panel-header-logo { 
+	background: #D00022;
+}
+.x-panel-header-logo a,.x-panel-header-logo a.visited{
+	color: white;
+	font-weight: 600;
+	text-decoration: none;
+}
+.x-grid3-header { 
+	background-image: none;
+	border-bottom: 1px solid #D0D0D0;
+}
+.x-grid3-row-selected { 
+}
+.x-toolbar-red {
+	background-image: none;
+	background-color: #D00022;
+} 

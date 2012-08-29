@@ -89,5 +89,40 @@ namespace com.ashaw.pricing
             updateSql += " WHERE [Id] = "+key;
             return updateSql;
         }
+
+        /// <summary>
+        /// Gets the save SQL.
+        /// </summary>
+        /// <param name="table">The table.</param>
+        /// <returns></returns>
+        public string GetInsertSQL(string table)
+        {
+            // Build an update statement back to the database.
+            List<DataField> fields = DataObjectSerialisers.GetFields(this);
+            string updateSql = "INSERT INTO [" + table + "]  (";
+            string fieldsSql = "";
+            string valuesSql = "";
+            foreach (DataField field in fields)
+            {
+                if (this.GetType().GetProperty(field.FieldName).GetValue(this) != null && field.sqlFieldName != "Id")
+                {
+                    fieldsSql += " [" + field.sqlFieldName + "] ";
+                    if (field.FieldType == typeof(DateTime))
+                        if (((DateTime)this.GetType().GetProperty(field.FieldName).GetValue(this)).Ticks == 0)
+                            valuesSql += " NULL ";
+                        else
+                            valuesSql += " CAST ( '" + DateTimeToSQLDateTime((DateTime)this.GetType().GetProperty(field.FieldName).GetValue(this)) + "' AS datetime)";
+                    else
+                        valuesSql += "'" + this.GetType().GetProperty(field.FieldName).GetValue(this).ToString() + "'";
+                    if (fields[fields.Count - 1] != field)
+                    {
+                        fieldsSql += ",";
+                        valuesSql += ",";
+                    }
+                }
+            }
+            updateSql += fieldsSql + ") VALUES ( " + valuesSql + " ) ";
+            return updateSql;
+        }
     }
 }

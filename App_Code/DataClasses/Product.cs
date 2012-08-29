@@ -21,7 +21,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The id.
         /// </value>
-        [DataField("Id", "pli_id", "")]
+        [DataField("Id")]
         public int Id { get; set; }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The pricelist id.
         /// </value>
-        [DataField("PricelistId", "pl_id", "")]
+        [DataField("PricelistId")]
         public int PricelistId { get; set; }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The pricing item id.
         /// </value>
-        [DataField("PricingItemId", "pi_id", "")]
+        [DataField("PricingItemId")]
         public int PricingItemId { get; set; }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The recurring price.
         /// </value>
-        [DataField("RecurringPrice", "pli_recurringprice", "")]
+        [DataField("RecurringPrice")]
         public double RecurringPrice { get; set; }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The setup price.
         /// </value>
-        [DataField("SetupPrice", "pli_setupprice", "")]
+        [DataField("SetupPrice")]
         public double SetupPrice { get; set; }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The setup cost.
         /// </value>
-        [DataField("SetupCost", "pli_setupcost", "")]
+        [DataField("SetupCost")]
         public double SetupCost { get; set; }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The recurring cost.
         /// </value>
-        [DataField("RecurringCost", "pli_recurringcost", "")]
+        [DataField("RecurringCost")]
         public double RecurringCost { get; set; }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The title.
         /// </value>
-        [DataField("Title", "pi_title", "")]
+        [DataField("Title")]
         public string Title { get; set; }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The description.
         /// </value>
-        [DataField("Description", "pi_description", "")]
+        [DataField("Description")]
         public string Description { get; set; }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The internal notes.
         /// </value>
-        [DataField("InternalNotes", "pi_internalnotes", "")]
+        [DataField("InternalNotes")]
         public string InternalNotes { get; set; }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The partcode.
         /// </value>
-        [DataField("Partcode", "pi_partcode", "")]
+        [DataField("Partcode")]
         public string Partcode { get; set; }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The group.
         /// </value>
-        [DataField("Group", "pi_group", "")]
+        [DataField("Group")]
         public string Group { get; set; }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The sub group.
         /// </value>
-        [DataField("SubGroup", "pi_subgroup", "")]
+        [DataField("SubGroup")]
         public string SubGroup { get; set; }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The availability.
         /// </value>
-        [DataField("Availability", "pi_availability", "")]
+        [DataField("Availability")]
         public string Availability { get; set; }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The size U.
         /// </value>
-        [DataField("SizeU", "pi_sizeu", "")]
+        [DataField("SizeU")]
         public int SizeU { get; set; }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The power.
         /// </value>
-        [DataField("Power", "pi_power", "")]
+        [DataField("Power")]
         public double Power { get; set; }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace com.ashaw.pricing
         /// <value>
         /// The manufacturer.
         /// </value>
-        [DataField("Manufacturer", "pi_manufacturer", "")]
+        [DataField("Manufacturer")]
         public string Manufacturer { get; set; }
     }
 }

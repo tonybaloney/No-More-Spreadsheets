@@ -73,6 +73,25 @@ namespace com.ashaw.pricing
         }
 
         /// <summary>
+        /// Closes this instance.
+        /// </summary>
+        public void Close()
+        {
+            Quote.Close(this.Id);
+        }
+
+        /// <summary>
+        /// Closes the specified quote id.
+        /// </summary>
+        /// <param name="QuoteId">The quote id.</param>
+        static public void Close(int quoteId)
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            object result = db.SProcToObject("CloseQuote", new KeyValuePair<string, object>("@QuoteId", quoteId));
+            db.Dispose();
+        }
+
+        /// <summary>
         /// Clears the items.
         /// </summary>
         public void ClearItems()
@@ -88,6 +107,7 @@ namespace com.ashaw.pricing
             DatabaseConnection db= new DatabaseConnection();
             db.RunScalarCommand(new System.Data.SqlClient.SqlCommand(this.GetSaveSQL(this.Id,"Quotes")));
             db.Dispose();
+            this.UpdateTotals();
         }
 
 
@@ -113,6 +133,15 @@ namespace com.ashaw.pricing
         /// </value>
         [DataField("Id","q_id")]
         public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the owner id.
+        /// </summary>
+        /// <value>
+        /// The owner id.
+        /// </value>
+        [DataField("OwnerId")]
+        public int OwnerId { get; set; } 
 
         /// <summary>
         /// Gets or sets the name of the owner.
