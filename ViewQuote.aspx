@@ -5,7 +5,7 @@
 <script type="text/javascript" src="ext/examples/ux/RowExpander.js"></script>
 <script type="text/javascript" src="ext/examples/shared/examples.js"></script>
 <link rel="stylesheet" type="text/css" href="ext/examples/shared/example.css" />
-<script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Products&QuoteId=<%=this.quoteId %>" ></script>
+<script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=ProductsToQuote&QuoteId=<%=this.quoteId %>" ></script>
 <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=QuoteItems&QuoteId=<%=this.quoteId %>" ></script>
 <script type="text/javascript" src="pricing/js/Dialogs.js"></script>
 <link rel="stylesheet" type="text/css" href="ext/icon_packs/fugue/css/fugue-pack.css" />
@@ -674,7 +674,7 @@
 	     * @return null
 	     */
         function SearchProduct( s ) {
-            Ext.data.StoreManager.lookup('ProductsStore').filter ( 'Title', s, true, false ) ;
+            Ext.data.StoreManager.lookup('ProductsToQuoteStore').filter ( 'Title', s, true, false ) ;
             if (s=='') ClearSearchProduct(); // close all groups if no search
         }
 	
@@ -683,7 +683,7 @@
 	     * @return null
 	     */
         function ClearSearchProduct(){
-            Ext.data.StoreManager.lookup('ProductsStore').clearFilter();
+            Ext.data.StoreManager.lookup('ProductsToQuoteStore').clearFilter();
         }
 	
         /**
@@ -878,7 +878,7 @@
 
         var componentGrid = new Ext.grid.GridPanel({
             region: 'west',
-            store: 'ProductsStore',
+            store: 'ProductsToQuoteStore',
             enableDragDrop: true,
             width: 300,
             minSize: 200,

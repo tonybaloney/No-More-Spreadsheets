@@ -33,9 +33,17 @@ namespace com.ashaw.pricing
                     int quoteid = Convert.ToInt32(Request.Params["QuoteId"]);
                     results = db.SProcToObjectList(type, "GetQuoteItems", new KeyValuePair<string, object>("@QuoteId", quoteid));
                     break;
-                case "Products":
+                case "ProductsToQuote":
                     type = typeof(Product);
                     results = db.SProcToObjectList(type, "GetProductsAvailableToQuote", new KeyValuePair<string, object>("@QuoteId",Convert.ToInt32(Request.Params["QuoteId"])));
+                    break;
+                case "Products":
+                    type = typeof(Product);
+                    results = db.SProcToObjectList(type, "GetAllProducts");
+                    break;
+                case "ProductLines":
+                    type = typeof(ProductLine);
+                    results = db.SProcToObjectList(type, "GetAllProductLines");
                     break;
             }
             db.Dispose();

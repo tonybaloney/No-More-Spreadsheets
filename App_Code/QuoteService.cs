@@ -22,7 +22,6 @@ public class QuoteService
 	public void RenewQuote(int QuoteId)
 	{
         throw new NotImplementedException();
-		return;
 	}
 
 	// Add more operations here and mark them with [OperationContract]
@@ -52,5 +51,16 @@ public class QuoteService
         q.Status = "template";
         q.Save();
         return;
+    }
+
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void CreateProductLine(string Name, string Description, string ProductManager)
+    {
+        ProductLine p = new ProductLine();
+        p.Name = Name;
+        p.Description = Description;
+        p.ProductManager = ProductManager;
+        p.Create();
     }
 }

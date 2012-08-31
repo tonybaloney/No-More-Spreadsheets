@@ -129,19 +129,6 @@
             popup.center();
         }
 
-        var pricelistCombo = new Ext.form.ComboBox({	
-            name:'q_pricelist',
-            store: 'PricelistsStore',
-            displayField:'pl_name',
-            fieldLabel : 'Pricelist',
-            valueField: 'pl_id',
-            mode: 'local',
-            editable : false,
-            listConfig: {
-                getInnerTpl :  function() { return '<div><h3><span>{pl_name}</span></h3>Currency: {pl_currency}<div>'; }
-            },
-            allowBlank: false
-        });
         function CreateQuote( templateid ){
             Ext.create('Ext.window.Window', {
                 layout:'fit',
@@ -197,8 +184,20 @@
                                 value: '',
                                 allowBlank: false,
                                 disabled: false
-                            }
-                            ,pricelistCombo
+                            },
+                            new Ext.form.ComboBox({
+                                name: 'q_pricelist',
+                                store: 'PricelistsStore',
+                                displayField: 'Name',
+                                fieldLabel: 'Pricelist',
+                                valueField: 'Id',
+                                mode: 'local',
+                                editable: false,
+                                listConfig: {
+                                    getInnerTpl: function () { return '<div><h3><span>{Name}</span></h3>Currency: {Currency}<div>'; }
+                                },
+                                allowBlank: false
+                            })
                         ],
                         buttons: [{
                             text: 'Create Quote', 
@@ -251,76 +250,10 @@
             region: 'center',
             items:grid
         });
-        var views = new Ext.tree.TreePanel({
-            title: 'My Quotes',
-            iconCls:'icon-fugue-user',
-            root: {
-                expanded: true,
-                children: [
-					{
-					    text: 'Open Quotes',
-					    viewOpt : '',
-					    iconCls: 'icon-fugue-door-open',
-					    leaf: true
-					}, {
-					    text: 'Closed Quotes',
-					    viewOpt : 'closed',
-					    iconCls: 'icon-fugue-door',
-					    leaf: true
-					}, {
-					    text: 'This Month',
-					    viewOpt : 'thismonth',
-					    iconCls: 'icon-fugue-calendar-month',
-					    leaf: true
-					}, {
-					    text: 'Last Month',
-					    viewOpt : 'lastmonth',
-					    iconCls: 'icon-fugue-calendar-previous',
-					    leaf: true
-					}
-                ]
-            },
-            rootVisible: false,
-            listeners: {
-                itemclick: function(t,n) {
-                    if ( n.raw.leaf ) 
-                        Ext.data.StoreManager.lookup('QuotesStore').load( {params: {viewOpt:n.raw.viewOpt, viewOptExtra:n.raw.viewOptExtra} }) ;
-                }
-            }
-        });
-        
-    var templatesView = new Ext.tree.TreePanel ({
-        title: 'Templates',
-        iconCls:'icon-fugue-script-block',
-        root: {
-            expanded: true,
-            children: [{ text: 'Quote Templates',
-                leaf :true,
-                viewOpt:'templates',
-                viewOptExtra:'',
-                iconCls:'icon-fugue-script-block'}
-            ]
-        },
-        rootVisible: false,
-        listeners: {
-            itemclick: function(t,n) {
-                Ext.data.StoreManager.lookup('QuotesStore').load( {params: {viewOpt:n.raw.viewOpt, viewOptExtra:n.raw.viewOptExtra} }) ;
-            }
-        }
-    });
-    var accordion = Ext.create('Ext.Panel', {
-        region:'west',
-        margins:'5 0 5 5',
-        split:true,
-        width: 210,
-        layout:'accordion',
-        items: [views,templatesView]
-    });
-		
     new Ext.Viewport({
         layout: 'border',
         plain:true,
-        items: [accordion,quotes],
+        items: [quotes],
         renderTo: document.body
     });
     });

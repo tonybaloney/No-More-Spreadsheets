@@ -46,10 +46,14 @@ namespace com.ashaw.pricing
                     return new User();
                 case "Pricelists":
                     return new Pricelist();
+                case "ProductsToQuote":
+                    return new Product();
                 case "Products":
                     return new Product();
                 case "QuoteItems":
                     return new QuoteItem();
+                case "ProductLines":
+                    return new ProductLine();
                 default:
                     throw new TypeAccessException("Type (" + name + ") not recognised.");
             }

@@ -9,25 +9,25 @@ namespace com.ashaw.pricing {
     /// </summary>
     public class Pricelist : DataObject
     {
-        [DataField("Id", "pl_id", "")]
+        [DataField("Id")]
         public int Id { get; set; }
 
-        [DataField("Name", "pl_name", "")]
+        [DataField("Name")]
         public string Name { get; set; }
 
-        [DataField("Date", "pl_date", "")]
+        [DataField("Date")]
         public DateTime Date { get; set; }
 
-        [DataField("IsDefault", "pl_isdefault", "")]
+        [DataField("IsDefault")]
         public bool IsDefault { get; set; }
 
-        [DataField("IsPrivate", "pl_isprivate", "")]
+        [DataField("IsPrivate")]
         public bool IsPrivate { get; set; }
 
-        [DataField("Currency", "pl_currency", "")]
+        [DataField("Currency")]
         public string Currency { get; set; }
 
-        [DataField("OwnerName", "pl_owner_name", "")]
+        [DataField("OwnerName")]
         public string OwnerName { get; set; }
     }
 }
