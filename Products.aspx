@@ -6,12 +6,15 @@
     <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Pricelists" ></script>
     <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Products" ></script>
     <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=ProductLines" ></script>
+    <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Users" ></script>
     <script type="text/javascript">
-        Ext.define('Pricing.FormWindow',{
-            extend:'Ext.window.Window',
-            initComponent: function() 
-            {
-                Ext.apply( this, {
+        Ext.define('Pricing.ProductLinePortlet', {
+            extend: 'Ext.grid.Panel',
+            CreateProductLine: function () {
+               var popup = new Ext.Window({
+                    width: 308,
+                    height: 240,
+                    title: 'Create Product Line',
                     layout: 'fit',
                     plain: true,
                     items: {
@@ -29,20 +32,7 @@
                         },
                         defaults: {
                             margins: '0 0 10 0'
-                        }
-                    }
-                });
-                this.callParent();
-            }
-        });
-        Ext.define('Pricing.ProductLinePortlet', {
-            extend: 'Ext.grid.Panel',
-            CreateProductLine: function () {
-                var popup = Ext.Create('Pricing.FormWindow', {
-                    width: 308,
-                    height: 240,
-                    title: 'Create Product Line',
-                    items: {
+                        },
                         url: 'QuoteService.svc/CreateProductLine',
                         items: [
                             {
@@ -80,14 +70,13 @@
                                 }
                             }
                         ]
-                    }
+                    }                     
                 });
                 popup.show(this);
                 popup.center();
             },
             initComponent: function () {
                 Ext.apply(this, {
-                    height: this.height,
                     id: 'product-line-grid',
                     flex: 1,
                     title: 'Product Lines',
@@ -164,6 +153,94 @@
         });
         Ext.define('Pricing.PricelistPortlet', {
             extend: 'Ext.grid.Panel',
+            CreatePricelist: function () {
+                var popup = new Ext.Window({
+                    width: 308,
+                    height: 240,
+                    title: 'Create Pricelist',
+                    layout: 'fit',
+                    plain: true,
+                    items: {
+                        xtype: 'form',
+                        layout: {
+                            type: 'vbox',
+                            align: 'stretch'
+                        },
+                        border: false,
+                        bodyPadding: 10,
+                        fieldDefaults: {
+                            labelAlign: 'top',
+                            labelWidth: 100,
+                            labelStyle: 'font-weight:bold'
+                        },
+                        defaults: {
+                            margins: '0 0 10 0'
+                        },
+                        url: 'QuoteService.svc/CreatePricelist',
+                        items: [
+                                {
+                                    "xtype": "textfield",
+                                    "fieldLabel": "Title",
+                                    "anchor": "100%",
+                                    name: 'Title'
+                                },
+                                {
+                                    "xtype": "combo",
+                                    "fieldLabel": "Owner",
+                                    "anchor": "100%",
+                                    store: 'UsersStore',
+                                    valueField: 'Id',
+                                    displayField: 'RealName',
+                                    hiddenName: 'pricelistowner',
+                                    editable: false,
+                                    name: 'OwnerId'
+                                }, {
+                                    xtype: "combo",
+                                    fieldLabel: "Product Lines",
+                                    store: 'ProductLinesStore',
+                                    valueField: 'Id',
+                                    displayField: 'Name',
+                                    hiddenName: 'ProductLines',
+                                    editable: false,
+                                    name: 'ProductLines',
+                                    multiSelect: true
+                                },
+                                {
+                                    xtype: "checkbox",
+                                    fieldLabel: "Public Pricelist",
+                                    boxLabel: "Public",
+                                    name: 'publicpricelist'
+                                },
+                                {
+                                    xtype: "combo",
+                                    fieldLabel: "Currency",
+                                    name: 'currency',
+                                    store: ['GBP', 'HKD', 'USD', 'EUR'],
+                                    selectOnFocus: true,
+                                    allowBlank: false
+                                }
+                            ],
+                        buttons: [
+                            {
+                                text: 'Create',
+                                handler: function () {
+                                    Ext.Ajax.request({
+                                        url: 'QuoteService.svc/CreateProductLine',
+                                        jsonData: this.up('form').getForm().getValues(),
+                                        success: function () {
+                                            Ext.getStore('ProductLinesStore').load();
+                                            popup.destroy();
+                                        },
+                                        failure: function () { alert('Error closing quote'); }
+                                    });
+                                }
+                            }
+                        ]
+                    }
+                });
+                popup.show(this);
+                popup.center();
+            },
             initComponent: function () {
                 Ext.apply(this, {
                     height: this.height,
@@ -205,7 +282,8 @@
                         items: [{
                             text: 'Add',
                             scope: this,
-                            iconCls: 'icon-add-trigger'
+                            iconCls: 'icon-add-trigger',
+                            handler: this.CreatePricelist
                         }, {
                             text: 'Delete',
                             scope: this,

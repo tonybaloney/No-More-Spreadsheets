@@ -5,9 +5,9 @@
     <title></title>
     <asp:ContentPlaceHolder id="head" runat="server">
     </asp:ContentPlaceHolder>
-    <link rel='stylesheet' type='text/css' href='ext/resources/css/ext-neptune.css'/>
-    <script src="ext/ext-all.js"></script>
-    <script src="ext/ext-neptune.js"></script>
+    <link rel='stylesheet' type='text/css' href='ext/resources/css/ext-all.css'/>
+    <script src="ext/ext-all-debug.js"></script>
+    <script src="ext/ext-neptune-debug.js"></script>
 </head>
 <body>
     <form id="form1" runat="server">
