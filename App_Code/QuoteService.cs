@@ -63,4 +63,18 @@ public class QuoteService
         p.ProductManager = ProductManager;
         p.Create();
     }
+
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void CreatePricelist(string Title, int OwnerId, string ProductLines, string Currency, string IsPublic)
+    {
+        Pricelist p = new Pricelist();
+        p.Name = Title;
+        p.IsDefault = false;
+        p.IsPrivate = (IsPublic != "on" ); 
+        p.OwnerId = OwnerId; 
+        p.Currency = Currency;
+        p.Date = DateTime.Now;
+        p.Create();
+    }
 }

@@ -9,10 +9,10 @@ namespace com.ashaw.pricing {
     /// </summary>
     public class User : DataObject
     {
-        [DataField("Id", "objectid", "")]
+        [DataField("Id")]
         public int Id { get; set; }
 
-        [DataField("RealName", "userrealname", "")]
+        [DataField("RealName")]
         public string RealName { get; set; }
     }
 }

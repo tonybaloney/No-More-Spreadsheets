@@ -12,7 +12,7 @@ public partial class CreateQuote : System.Web.UI.Page
         if (!String.IsNullOrEmpty(Request.Params["quote_create"]))
         {
             // Associate owner from form.
-            int newOwner = Convert.ToInt32(Request.Params["q_owner"]);
+            int newOwner = Convert.ToInt32(Request.Params["Owner"]);
             // TODO: Integrate customer lookup with internal system to get customer 'ID'
             int customerId = 0; // Un-used
             // From form

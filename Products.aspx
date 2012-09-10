@@ -1,6 +1,6 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="Products.aspx.cs" Inherits="Products" %>
 
-<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server" >
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
     <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Pricelists" ></script>
@@ -8,6 +8,13 @@
     <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=ProductLines" ></script>
     <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Users" ></script>
     <script type="text/javascript">
+        Ext.Loader.setConfig({ enabled: true });
+        Ext.Loader.setPath('Ext.ux', 'ext/examples/ux');
+        Ext.require([
+            'Ext.form.Panel',
+            'Ext.ux.form.MultiSelect',
+            'Ext.ux.form.ItemSelector'
+        ]);
         Ext.define('Pricing.ProductLinePortlet', {
             extend: 'Ext.grid.Panel',
             CreateProductLine: function () {
@@ -176,18 +183,15 @@
                         defaults: {
                             margins: '0 0 10 0'
                         },
-                        url: 'QuoteService.svc/CreatePricelist',
                         items: [
                                 {
-                                    "xtype": "textfield",
-                                    "fieldLabel": "Title",
-                                    "anchor": "100%",
+                                    xtype: "textfield",
+                                    fieldLabel: "Title",
                                     name: 'Title'
                                 },
                                 {
-                                    "xtype": "combo",
-                                    "fieldLabel": "Owner",
-                                    "anchor": "100%",
+                                    xtype: "combo",
+                                    fieldLabel: "Owner",
                                     store: 'UsersStore',
                                     valueField: 'Id',
                                     displayField: 'RealName',
@@ -195,13 +199,11 @@
                                     editable: false,
                                     name: 'OwnerId'
                                 }, {
-                                    xtype: "combo",
+                                    xtype: "multiselect",
                                     fieldLabel: "Product Lines",
                                     store: 'ProductLinesStore',
                                     valueField: 'Id',
                                     displayField: 'Name',
-                                    hiddenName: 'ProductLines',
-                                    editable: false,
                                     name: 'ProductLines',
                                     multiSelect: true
                                 },
@@ -209,13 +211,13 @@
                                     xtype: "checkbox",
                                     fieldLabel: "Public Pricelist",
                                     boxLabel: "Public",
-                                    name: 'publicpricelist'
+                                    name: 'IsPublic'
                                 },
                                 {
                                     xtype: "combo",
                                     fieldLabel: "Currency",
-                                    name: 'currency',
-                                    store: ['GBP', 'HKD', 'USD', 'EUR'],
+                                    name: 'Currency',
+                                    store: ['GBP', 'AUD', 'USD', 'EUR'],
                                     selectOnFocus: true,
                                     allowBlank: false
                                 }
@@ -225,13 +227,13 @@
                                 text: 'Create',
                                 handler: function () {
                                     Ext.Ajax.request({
-                                        url: 'QuoteService.svc/CreateProductLine',
+                                        url: 'QuoteService.svc/CreatePricelist',
                                         jsonData: this.up('form').getForm().getValues(),
                                         success: function () {
-                                            Ext.getStore('ProductLinesStore').load();
+                                            Ext.getStore('PricelistsStore').load();
                                             popup.destroy();
                                         },
-                                        failure: function () { alert('Error closing quote'); }
+                                        failure: function () { alert('Error creating pricelist'); }
                                     });
                                 }
                             }

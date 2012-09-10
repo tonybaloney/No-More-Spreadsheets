@@ -96,14 +96,12 @@
                     items: [
                         new Ext.form.ComboBox({
                             store: 'UsersStore',
-                            valueField:'objectid',
-                            displayField:'userrealname',
-                            hiddenName:'q_owner_id',
-                            typeAhead:true,
-                            mode:'local',
+                            valueField:'Id',
+                            displayField:'RealName',
+                            hiddenName:'OwnerId',
                             editable:false,
                             fieldLabel: 'Quote Owner',
-                            name: 'q_owner',
+                            name: 'Owner',
                             allowBlank: false
                         })
                     ],
@@ -162,13 +160,11 @@
                             },
                             new Ext.form.ComboBox({
                                 store: 'UsersStore',
-                                valueField:'objectid',
-                                displayField:'userrealname',
-                                triggerAction:'all',
-                                mode:'local',
+                                valueField:'Id',
+                                displayField:'RealName',
                                 editable:false,
                                 fieldLabel: 'Quote Owner',
-                                name: 'q_owner',
+                                name: 'Owner',
                                 allowBlank: false
                             }),
                             { 

@@ -48,11 +48,19 @@ namespace com.ashaw.pricing
         public string FieldName { get; set; } 
 
         /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="DataField" /> is readonlyfield.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if readonlyfield; otherwise, <c>false</c>.
+        /// </value>
+        public bool readonlyfield {get; set;}
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataField" /> class.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="name">The name.</param>
-        public DataField(string name) : this(name, name, "") { }
+        public DataField(string name, bool readonlyfield = false) : this(name, name, "", readonlyfield) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataField" /> class.
@@ -60,7 +68,7 @@ namespace com.ashaw.pricing
         /// <param name="type">The type.</param>
         /// <param name="name">The name.</param>
         /// <param name="sortType">Type of the sort.</param>
-        public DataField(string name, string sortType) : this(name, name, sortType) { }
+        public DataField(string name, string sortType, bool readonlyfield = false) : this(name, name, sortType, readonlyfield) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataField" /> class.
@@ -69,11 +77,12 @@ namespace com.ashaw.pricing
         /// <param name="sqlFieldName">Name of the SQL field.</param>
         /// <param name="jsonFieldName">Name of the json field.</param>
         /// <param name="sortType">Type of the sort.</param>
-        public DataField(string sqlFieldName, string jsonFieldName, string sortType)
+        public DataField(string sqlFieldName, string jsonFieldName, string sortType, bool readonlyfield=false)
         {
             this.sortType = sortType;
             this.sqlFieldName = sqlFieldName;
             this.jsonFieldName = jsonFieldName;
+            this.readonlyfield = readonlyfield;
         }
     }
 }

@@ -76,7 +76,7 @@ namespace com.ashaw.pricing
             List<DataField> fields = DataObjectSerialisers.GetFields(this);
             string updateSql = "UPDATE ["+table+"] SET " ;
             foreach (DataField field in fields){
-                if (this.GetType().GetProperty(field.FieldName).GetValue(this) != null && field.sqlFieldName != "Id")
+                if (this.GetType().GetProperty(field.FieldName).GetValue(this) != null && field.sqlFieldName != "Id" && !field.readonlyfield)
                 {
                     updateSql += " [" + field.sqlFieldName + "] = ";
                     if (field.FieldType == typeof(DateTime))
@@ -108,7 +108,7 @@ namespace com.ashaw.pricing
             string valuesSql = "";
             foreach (DataField field in fields)
             {
-                if (this.GetType().GetProperty(field.FieldName).GetValue(this) != null && field.sqlFieldName != "Id")
+                if (this.GetType().GetProperty(field.FieldName).GetValue(this) != null && field.sqlFieldName != "Id" && !field.readonlyfield)
                 {
                     fieldsSql += " [" + field.sqlFieldName + "] ";
                     if (field.FieldType == typeof(DateTime))
