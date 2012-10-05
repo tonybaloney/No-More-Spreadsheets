@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace com.ashaw.pricing
+{
+    /// <summary>
+    /// Summary description for Product
+    /// </summary>
+    public class PricedProduct : Product
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Product" /> class.
+        /// </summary>
+        public PricedProduct() { }
+
+        /// <summary>
+        /// Gets or sets the id.
+        /// </summary>
+        /// <value>
+        /// The id.
+        /// </value>
+        [DataField("Id")]
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pricelist id.
+        /// </summary>
+        /// <value>
+        /// The pricelist id.
+        /// </value>
+        [DataField("PricelistId")]
+        public int PricelistId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pricing item id.
+        /// </summary>
+        /// <value>
+        /// The pricing item id.
+        /// </value>
+        [DataField("PricingItemId")]
+        public int PricingItemId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the recurring price.
+        /// </summary>
+        /// <value>
+        /// The recurring price.
+        /// </value>
+        [DataField("RecurringPrice")]
+        public double RecurringPrice { get; set; }
+
+        /// <summary>
+        /// Gets or sets the setup price.
+        /// </summary>
+        /// <value>
+        /// The setup price.
+        /// </value>
+        [DataField("SetupPrice")]
+        public double SetupPrice { get; set; }
+
+        /// <summary>
+        /// Gets or sets the setup cost.
+        /// </summary>
+        /// <value>
+        /// The setup cost.
+        /// </value>
+        [DataField("SetupCost")]
+        public double SetupCost { get; set; }
+
+        /// <summary>
+        /// Gets or sets the recurring cost.
+        /// </summary>
+        /// <value>
+        /// The recurring cost.
+        /// </value>
+        [DataField("RecurringCost")]
+        public double RecurringCost { get; set; }
+
+    }
+}

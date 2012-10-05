@@ -12,12 +12,71 @@ namespace com.ashaw.pricing {
         /// <summary>
         /// Creates this instance.
         /// </summary>
-        public void Create()
+        public Pricelist Create()
         {
             DatabaseConnection db = new DatabaseConnection();
             System.Data.SqlClient.SqlCommand com = new System.Data.SqlClient.SqlCommand(this.GetInsertSQL("Pricelists"));
             db.RunScalarCommand(com);
+            Pricelist p = new Pricelist(db.GetIdentity());
             db.Dispose();
+            return p;
+        }
+
+        /// <summary>
+        /// Deletes the specified pricelist id.
+        /// </summary>
+        /// <param name="PricelistId">The pricelist id.</param>
+        public static void Delete(int PricelistId)
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            db.SProc("DeletePricelist", new KeyValuePair<string, object>("@Id", PricelistId));
+            db.Dispose();
+        }
+
+        /// <summary>
+        /// Deletes this instance.
+        /// </summary>
+        public void Delete()
+        {
+            Pricelist.Delete(this.Id);
+        }
+
+        /// <summary>
+        /// Attaches the product line to the pricelist
+        /// </summary>
+        /// <param name="PricelistId">The pricelist id.</param>
+        /// <param name="ProductLineId">The product line id.</param>
+        static public void AttachProductLine(int PricelistId, int ProductLineId)
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            db.SProc("AttachProductLineToPricelist", new KeyValuePair<string, object>("@PricelistId", PricelistId), new KeyValuePair<string, object>("@ProductLineId", ProductLineId));
+            db.Dispose();
+        }
+
+        /// <summary>
+        /// Attaches the product line to this pricelist
+        /// </summary>
+        /// <param name="ProductLineId">The product line id.</param>
+        public void AttachProductLine(int ProductLineId)
+        {
+            Pricelist.AttachProductLine(this.Id, ProductLineId);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Pricelist" /> class.
+        /// </summary>
+        public Pricelist()
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Quote" /> class.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        public Pricelist(int id) : base(id,"GetPricelist")
+        {
+            
         }
 
         /// <summary>

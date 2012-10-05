@@ -73,10 +73,16 @@ namespace com.ashaw.pricing
         public string GetSaveSQL(int key, string table)
         {
             // Build an update statement back to the database.
-            List<DataField> fields = DataObjectSerialisers.GetFields(this);
+            List<DataField> clearedFields = new List<DataField>(), fields = DataObjectSerialisers.GetFields(this);
             string updateSql = "UPDATE ["+table+"] SET " ;
-            foreach (DataField field in fields){
-                if (this.GetType().GetProperty(field.FieldName).GetValue(this) != null && field.sqlFieldName != "Id" && !field.readonlyfield)
+            // take out read only fields and ID fields.
+            foreach (DataField field in fields)
+            {
+                if (field.sqlFieldName != "Id" && !field.readonlyfield)
+                    clearedFields.Add(field);
+            }
+            foreach (DataField field in clearedFields){
+                if (this.GetType().GetProperty(field.FieldName).GetValue(this) != null)
                 {
                     updateSql += " [" + field.sqlFieldName + "] = ";
                     if (field.FieldType == typeof(DateTime))
@@ -86,7 +92,7 @@ namespace com.ashaw.pricing
                             updateSql += " CAST ( '" + DateTimeToSQLDateTime((DateTime)this.GetType().GetProperty(field.FieldName).GetValue(this)) + "' AS datetime)";
                     else
                         updateSql += "'" + this.GetType().GetProperty(field.FieldName).GetValue(this).ToString() + "'";
-                    if (fields[fields.Count - 1] != field) 
+                    if (clearedFields[clearedFields.Count - 1] != field) 
                         updateSql += ",";
                 }
             }
@@ -102,13 +108,19 @@ namespace com.ashaw.pricing
         public string GetInsertSQL(string table)
         {
             // Build an update statement back to the database.
-            List<DataField> fields = DataObjectSerialisers.GetFields(this);
+            List<DataField> clearedFields = new List<DataField>(), fields = DataObjectSerialisers.GetFields(this);
             string updateSql = "INSERT INTO [" + table + "]  (";
             string fieldsSql = "";
             string valuesSql = "";
+            // take out read only fields and ID fields.
             foreach (DataField field in fields)
             {
-                if (this.GetType().GetProperty(field.FieldName).GetValue(this) != null && field.sqlFieldName != "Id" && !field.readonlyfield)
+                if ( field.sqlFieldName != "Id" && !field.readonlyfield ) 
+                    clearedFields.Add(field);
+            }
+            foreach (DataField field in clearedFields)
+            {
+                if (this.GetType().GetProperty(field.FieldName).GetValue(this) != null)
                 {
                     fieldsSql += " [" + field.sqlFieldName + "] ";
                     if (field.FieldType == typeof(DateTime))
@@ -118,7 +130,7 @@ namespace com.ashaw.pricing
                             valuesSql += " CAST ( '" + DateTimeToSQLDateTime((DateTime)this.GetType().GetProperty(field.FieldName).GetValue(this)) + "' AS datetime)";
                     else
                         valuesSql += "'" + this.GetType().GetProperty(field.FieldName).GetValue(this).ToString() + "'";
-                    if (fields[fields.Count - 1] != field)
+                    if (clearedFields[clearedFields.Count - 1] != field)
                     {
                         fieldsSql += ",";
                         valuesSql += ",";

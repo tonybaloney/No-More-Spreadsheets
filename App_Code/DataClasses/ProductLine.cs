@@ -15,6 +15,25 @@ public class ProductLine : DataObject
 	}
 
     /// <summary>
+    /// Deletes the specified pricelist id.
+    /// </summary>
+    /// <param name="ProductLineId">The product line id.</param>
+    public static void Delete(int ProductLineId)
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        db.SProc("DeleteProductLine", new KeyValuePair<string, object>("@Id", ProductLineId));
+        db.Dispose();
+    }
+
+    /// <summary>
+    /// Deletes this instance.
+    /// </summary>
+    public void Delete()
+    {
+        ProductLine.Delete(this.Id);
+    }
+
+    /// <summary>
     /// Creates this instance.
     /// </summary>
     public void Create()

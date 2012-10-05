@@ -34,7 +34,7 @@ namespace com.ashaw.pricing
                     results = db.SProcToObjectList(type, "GetQuoteItems", new KeyValuePair<string, object>("@QuoteId", quoteid));
                     break;
                 case "ProductsToQuote":
-                    type = typeof(Product);
+                    type = typeof(PricedProduct);
                     results = db.SProcToObjectList(type, "GetProductsAvailableToQuote", new KeyValuePair<string, object>("@QuoteId",Convert.ToInt32(Request.Params["QuoteId"])));
                     break;
                 case "Products":
@@ -44,6 +44,14 @@ namespace com.ashaw.pricing
                 case "ProductLines":
                     type = typeof(ProductLine);
                     results = db.SProcToObjectList(type, "GetAllProductLines");
+                    break;
+                case "Packages":
+                    type = typeof(Package);
+                    results = db.SProcToObjectList(type, "GetPackages");
+                    break;
+                case "PackagesInProductLine":
+                    type = typeof(Package);
+                    results = db.SProcToObjectList(type, "GetPackagesInProductLine", new KeyValuePair<string, object>("@ProductLineId", Convert.ToInt32(Request.Params["ProductLineId"])));
                     break;
             }
             db.Dispose();

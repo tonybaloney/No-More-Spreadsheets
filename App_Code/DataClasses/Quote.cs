@@ -24,8 +24,7 @@ namespace com.ashaw.pricing
             DatabaseConnection db = new DatabaseConnection();
             object result = db.SProcToObject("CreateQuote", new KeyValuePair<string, object>("@OwnerId", ownerId), new KeyValuePair<string, object>("@CustomerId", customerId), new KeyValuePair<string, object>("@CustomerName", customerName), new KeyValuePair<string, object>("@PricelistId", pricelistId), new KeyValuePair<string, object>("@QuoteTitle", title));
             db.Dispose();
-            Quote q = new Quote();
-            q.Id = Convert.ToInt32(result);
+            Quote q = new Quote(Convert.ToInt32(result));
             return q;
         }
 
@@ -36,7 +35,8 @@ namespace com.ashaw.pricing
         /// <param name="originQuoteId">The origin quote id.</param>
         static public void CloneItems(int targetQuoteId, int originQuoteId)
         {
-            //	PricingDBQuery ( "INSERT INTO `quote_items` (`quote_id`, `pi_id`, `qi_title`, `qi_description`, `qi_quantity`, `qi_setupcost`, `qi_recurringcost`,`qi_setupprice`,`qi_recurringprice`, `qi_groupname`, `qi_subgroup`, `qi_partcode`, `qi_notes`,`qi_index`,`qi_ispart`,`qi_isbundle`,`qi_bundleid` ) SELECT $newquoteid, `pi_id`, `qi_title`, `qi_description`, `qi_quantity`, `qi_setupcost`, `qi_recurringcost`,`qi_setupprice`,`qi_recurringprice`, `qi_groupname`, `qi_subgroup`, `qi_partcode`,`qi_notes`,`qi_index`,`qi_ispart`,`qi_isbundle`,`qi_bundleid` FROM `quote_items` WHERE `quote_id` = $quoteid");
+            // TODO 
+            throw new NotImplementedException();
         }
 
         /// <summary>

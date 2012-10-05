@@ -16,6 +16,65 @@ namespace com.ashaw.pricing
         public Product() { }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Product" /> class.
+        /// </summary>
+        /// <param name="Id">The id.</param>
+        public Product(int Id) : base(Id, "GetProduct") { }
+
+        /// <summary>
+        /// Creates this instance.
+        /// </summary>
+        public Product Create()
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            System.Data.SqlClient.SqlCommand com = new System.Data.SqlClient.SqlCommand(this.GetInsertSQL("Products"));
+            db.RunScalarCommand(com);
+            Product p = new Product(db.GetIdentity());
+            db.Dispose();
+            return p;
+        }
+
+        /// <summary>
+        /// Deletes the specified product id.
+        /// </summary>
+        /// <param name="ProductId">The product id.</param>
+        public static void Delete(int ProductId)
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            db.SProc("DeleteProduct", new KeyValuePair<string, object>("@Id", ProductId));
+            db.Dispose();
+        }
+
+        /// <summary>
+        /// Deletes this instance.
+        /// </summary>
+        public void Delete()
+        {
+            Product.Delete(this.Id);
+        }
+
+        /// <summary>
+        /// Attaches the product line to the pricelist
+        /// </summary>
+        /// <param name="ProductId">The product id.</param>
+        /// <param name="ProductLineId">The product line id.</param>
+        static public void AttachProductLine(int ProductId, int ProductLineId)
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            db.SProc("AttachProductLineToProduct", new KeyValuePair<string, object>("@ProductId", ProductId), new KeyValuePair<string, object>("@ProductLineId", ProductLineId));
+            db.Dispose();
+        }
+
+        /// <summary>
+        /// Attaches the product line to this pricelist
+        /// </summary>
+        /// <param name="ProductLineId">The product line id.</param>
+        public void AttachProductLine(int ProductLineId)
+        {
+            Product.AttachProductLine(this.Id, ProductLineId);
+        }
+
+        /// <summary>
         /// Gets or sets the id.
         /// </summary>
         /// <value>
@@ -23,60 +82,6 @@ namespace com.ashaw.pricing
         /// </value>
         [DataField("Id")]
         public int Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pricelist id.
-        /// </summary>
-        /// <value>
-        /// The pricelist id.
-        /// </value>
-        [DataField("PricelistId")]
-        public int PricelistId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the pricing item id.
-        /// </summary>
-        /// <value>
-        /// The pricing item id.
-        /// </value>
-        [DataField("PricingItemId")]
-        public int PricingItemId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the recurring price.
-        /// </summary>
-        /// <value>
-        /// The recurring price.
-        /// </value>
-        [DataField("RecurringPrice")]
-        public double RecurringPrice { get; set; }
-
-        /// <summary>
-        /// Gets or sets the setup price.
-        /// </summary>
-        /// <value>
-        /// The setup price.
-        /// </value>
-        [DataField("SetupPrice")]
-        public double SetupPrice { get; set; }
-
-        /// <summary>
-        /// Gets or sets the setup cost.
-        /// </summary>
-        /// <value>
-        /// The setup cost.
-        /// </value>
-        [DataField("SetupCost")]
-        public double SetupCost { get; set; }
-
-        /// <summary>
-        /// Gets or sets the recurring cost.
-        /// </summary>
-        /// <value>
-        /// The recurring cost.
-        /// </value>
-        [DataField("RecurringCost")]
-        public double RecurringCost { get; set; }
 
         /// <summary>
         /// Gets or sets the title.
@@ -140,24 +145,6 @@ namespace com.ashaw.pricing
         /// </value>
         [DataField("Availability")]
         public string Availability { get; set; }
-
-        /// <summary>
-        /// Gets or sets the size U.
-        /// </summary>
-        /// <value>
-        /// The size U.
-        /// </value>
-        [DataField("SizeU")]
-        public int SizeU { get; set; }
-
-        /// <summary>
-        /// Gets or sets the power.
-        /// </summary>
-        /// <value>
-        /// The power.
-        /// </value>
-        [DataField("Power")]
-        public double Power { get; set; }
 
         /// <summary>
         /// Gets or sets the manufacturer.

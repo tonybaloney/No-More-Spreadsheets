@@ -35,16 +35,6 @@ namespace com.ashaw.pricing
         }
 
         /// <summary>
-        /// Runs the command.
-        /// </summary>
-        /// <param name="comm">The command.</param>
-        public void RunReaderCommand ( SqlCommand command ) {
-            command.Connection = this.sqlConnection;
-            SqlDataReader sdr = command.ExecuteReader();
-            //  TODO : complete.
-        }
-
-        /// <summary>
         /// Runs the scalar command.
         /// </summary>
         /// <param name="command">The command.</param>
@@ -52,11 +42,20 @@ namespace com.ashaw.pricing
         public object RunScalarCommand(SqlCommand command)
         {
             command.Connection = this.sqlConnection;
-            command.Connection.Open();
+            if(command.Connection.State != ConnectionState.Open) command.Connection.Open();
             object result = command.ExecuteScalar();
-            command.Connection.Close();
-            command.Dispose();
             return result;
+        }
+
+        /// <summary>
+        /// Gets the identity. (@@IDENTITY tag in SQL)
+        /// </summary>
+        /// <returns></returns>
+        public int GetIdentity()
+        {
+            SqlCommand com = new SqlCommand("SELECT @@IDENTITY");
+            object result = this.RunScalarCommand(com);
+            return Convert.ToInt32(result);
         }
 
         /// <summary>
@@ -72,8 +71,9 @@ namespace com.ashaw.pricing
             // Call the stored procedure with the parameters.
             SqlCommand command = new SqlCommand();
             command.Connection = this.sqlConnection;
-            command.Connection.Open();
-            foreach ( KeyValuePair<string,object> kvp in sProcParams){
+            if (command.Connection.State != ConnectionState.Open) command.Connection.Open();
+            foreach (KeyValuePair<string, object> kvp in sProcParams)
+            {
                 command.Parameters.Add(new SqlParameter(kvp.Key,kvp.Value));
             }
             command.CommandType = System.Data.CommandType.StoredProcedure;
@@ -96,8 +96,6 @@ namespace com.ashaw.pricing
                 // translate each KVP from this row into the properties in our class.
                 results.Add(DataObjectSerialisers.TranslateKVPsToObjects(rowResults, resultType));
             }
-            command.Connection.Close();
-            command.Dispose();
             return results;
         }
 
@@ -114,7 +112,7 @@ namespace com.ashaw.pricing
             // Call the stored procedure with the parameters.
             SqlCommand command = new SqlCommand();
             command.Connection = this.sqlConnection;
-            command.Connection.Open();
+            if (command.Connection.State != ConnectionState.Open) command.Connection.Open();
             foreach (KeyValuePair<string, object> kvp in sProcParams)
             {
                 command.Parameters.Add(new SqlParameter(kvp.Key, kvp.Value));
@@ -126,8 +124,6 @@ namespace com.ashaw.pricing
             pRetValue.Direction = ParameterDirection.ReturnValue;
 
             command.ExecuteScalar();
-            command.Connection.Close();
-            command.Dispose();
 
             return command.Parameters["@Ret"].Value;
         }
@@ -141,7 +137,7 @@ namespace com.ashaw.pricing
             // Call the stored procedure with the parameters.
             SqlCommand command = new SqlCommand();
             command.Connection = this.sqlConnection;
-            command.Connection.Open();
+            if (command.Connection.State != ConnectionState.Open) command.Connection.Open();
             foreach (KeyValuePair<string, object> kvp in sProcParams)
             {
                 command.Parameters.Add(new SqlParameter(kvp.Key, kvp.Value));
@@ -149,8 +145,6 @@ namespace com.ashaw.pricing
             command.CommandType = System.Data.CommandType.StoredProcedure;
             command.CommandText = sProcName;
             command.ExecuteScalar();
-            command.Connection.Close();
-            command.Dispose();
         }
     }
 }

@@ -17,6 +17,21 @@
         ]);
         Ext.define('Pricing.ProductLinePortlet', {
             extend: 'Ext.grid.Panel',
+            DeleteProductLine: function () {
+                if (Ext.getCmp('product-line-grid').getSelectionModel().selected.length > 0) {
+                    Ext.Msg.confirm('Delete?', 'Are you sure you want to delete?', function (button) {
+                        if (button === 'yes') {
+                            // do something when Yes was clicked.
+                            Ext.Ajax.request({
+                                url: 'QuoteService.svc/DeleteProductLine',
+                                jsonData: { Id: Ext.getCmp('product-line-grid').getSelectionModel().selected.items[0].data.Id },
+                                success: function () { Ext.getStore('ProductLinesStore').load(); },
+                                failure: function () { alert('Error deleting pricelist'); }
+                            });
+                        }
+                    });
+                }
+            },
             CreateProductLine: function () {
                var popup = new Ext.Window({
                     width: 308,
@@ -64,6 +79,7 @@
                         buttons: [
                             {
                                 text: 'Create',
+                                formBind: true,
                                 handler: function () {
                                     Ext.Ajax.request({
                                         url: 'QuoteService.svc/CreateProductLine',
@@ -87,7 +103,7 @@
                     id: 'product-line-grid',
                     flex: 1,
                     title: 'Product Lines',
-                    iconCls: 'icon-trigger',
+                    icon: 'res/icons/package.png',
                     store: 'ProductLinesStore',
                     border: false,
                     stripeRows: true,
@@ -105,13 +121,19 @@
                             text: 'Add',
                             scope: this,
                             handler: this.CreateProductLine,
-                            iconCls: 'icon-add-trigger'
+                            icon: 'res/icons/package_add.png'
                         }, {
                             text: 'Delete',
-                            id: 'DeleteTrigger',
-                            disabled: true,
                             scope: this,
-                            iconCls: 'icon-delete-trigger'
+                            icon: 'res/icons/package_delete.png',
+                            handler: this.DeleteProductLine
+                        }, { xtype: 'tbfill' },
+                        {
+                            text: 'Clear Selection',
+                            icon: 'res/icons/bullet_white.png',
+                            handler: function () {
+                                this.ownerCt.ownerCt.getSelectionModel().deselectAll();
+                            }
                         }
                         ]
                     }]
@@ -121,13 +143,119 @@
         });
         Ext.define('Pricing.ProductPortlet', {
             extend: 'Ext.grid.Panel',
+            DeleteProduct: function () {
+                if (Ext.getCmp('products-grid').getSelectionModel().selected.length > 0) {
+                    Ext.Msg.confirm('Delete?', 'Are you sure you want to delete?', function (button) {
+                        if (button === 'yes') {
+                            // do something when Yes was clicked.
+                            Ext.Ajax.request({
+                                url: 'QuoteService.svc/DeleteProduct',
+                                jsonData: { Id: Ext.getCmp('products-grid').getSelectionModel().selected.items[0].data.Id },
+                                success: function () { Ext.getStore('ProductsStore').load(); },
+                                failure: function () { alert('Error deleting product.'); }
+                            });
+                        }
+                    });
+                }
+            },
+            CreateProduct: function () {
+                var popup = new Ext.Window({
+                    width: 420,
+                    height: 540,
+                    title: 'Create Product',
+                    icon: 'res/icons/brick_add.png',
+                    items: {
+                        xtype: 'form',
+                        layout: { type: 'vbox', align: 'stretch' },
+                        border: false,
+                        bodyPadding: 10,
+                        fieldDefaults: { labelWidth: 100 },
+                        items: [
+                                {
+                                    xtype: "textfield",
+                                    fieldLabel: "Title",
+                                    name: 'Title'
+                                },
+                                {
+                                    xtype: "textfield",
+                                    fieldLabel: "Group",
+                                    name: 'Group'
+                                },
+                                {
+                                    xtype: "textfield",
+                                    fieldLabel: "Subgroup",
+                                    name: 'Subgroup'
+                                },
+                                {
+                                    xtype: "textfield",
+                                    fieldLabel: "Partcode",
+                                    name: 'Partcode'
+                                },
+                                {
+                                    xtype: "textfield",
+                                    fieldLabel: "Manufacturer",
+                                    name: 'Manufacturer'
+                                },
+                                {
+                                    xtype: "textareafield",
+                                    fieldLabel: "Description",
+                                    name: 'Description'
+                                },
+                                {
+                                    xtype: "textareafield",
+                                    fieldLabel: "Internal Notes",
+                                    name: 'InternalNotes'
+                                },
+                                {
+                                    xtype: "combo",
+                                    fieldLabel: "Availability",
+                                    name: 'Availability',
+                                    store: ['available','out of stock','on hold','end of sale','end of life'],
+                                    selectOnFocus: true,
+                                    allowBlank: false
+                                },
+                                 {
+                                     xtype: "multiselect",
+                                     fieldLabel: "Product Lines",
+                                     store: 'ProductLinesStore',
+                                     minSelections:1,
+                                     height: 150,
+                                     valueField: 'Id',
+                                     displayField: 'Name',
+                                     name: 'ProductLines',
+                                     multiSelect: true
+                                 }
+                        ],
+                        buttons: [
+                            {
+                                text: 'Create',
+                                formBind: true,
+                                handler: function () {
+                                    Ext.Ajax.request({
+                                        url: 'QuoteService.svc/CreateProduct',
+                                        jsonData: this.up('form').getForm().getValues(),
+                                        success: function () {
+                                            Ext.getStore('ProductsStore').load();
+                                            popup.destroy();
+                                        },
+                                        failure: function () { alert('Error creating product.'); }
+                                    });
+                                }
+                            }
+                            ,{ text:'?',handler : function () { alert ( this.ownerCt.ownerCt.ownerCt.width + " x " + this.ownerCt.ownerCt.ownerCt.height ) ; } } 
+                        ]
+                    }
+                });
+                popup.show(this);
+                popup.center();
+            },
             initComponent: function () {
                 Ext.apply(this, {
                     height: this.height,
                     id: 'products-grid',
                     flex: 1,
                     title: 'Products',
-                    iconCls: 'icon-trigger',
+                    icon: 'res/icons/brick.png',
                     store: 'ProductsStore',
                     border: false,
                     stripeRows: true,
@@ -138,19 +266,36 @@
                         flex: 1,
                         sortable: true,
                         dataIndex: 'Title'
+                        // TODO create template to show all product attributes on row item
                     }],
                     dockedItems: [{
                         xtype: 'toolbar',
                         items: [{
                             text: 'Add',
                             scope: this,
-                            iconCls: 'icon-add-trigger'
+                            icon: 'res/icons/brick_add.png',
+                            handler:  this.CreateProduct
                         }, {
                             text: 'Delete',
-                            id: 'DeleteTrigger',
-                            disabled: true,
                             scope: this,
-                            iconCls: 'icon-delete-trigger'
+                            icon: 'res/icons/brick_delete.png',
+                            handler: this.DeleteProduct
+                        },
+                        {
+                            xtype: 'combobox',
+                            store: 'ProductLinesStore',
+                            valueField: 'Id',
+                            displayField: 'Name',
+                            emptyText: 'Product Line..'
+                            // TODO action filter on selection
+                        }
+                        ,{ xtype: 'tbfill' },
+                        {
+                            text: 'Clear Selection',
+                            icon: 'res/icons/bullet_white.png',
+                            handler: function () {
+                                this.ownerCt.ownerCt.getSelectionModel().deselectAll();
+                            }
                         }
                         ]
                     }]
@@ -160,29 +305,33 @@
         });
         Ext.define('Pricing.PricelistPortlet', {
             extend: 'Ext.grid.Panel',
+            DeletePricelist: function () {
+                if (Ext.getCmp('pricelists-grid').getSelectionModel().selected.length > 0) {
+                    Ext.Msg.confirm('Delete?', 'Are you sure you want to delete?', function (button) {
+                        if (button === 'yes') {
+                            // do something when Yes was clicked.
+                            Ext.Ajax.request({
+                                url: 'QuoteService.svc/DeletePricelist',
+                                jsonData: { Id: Ext.getCmp('pricelists-grid').getSelectionModel().selected.items[0].data.Id},
+                                success: function () { Ext.getStore('PricelistsStore').load();  },
+                                failure: function () { alert('Error deleting pricelist'); }
+                            });
+                        }
+                    });
+                }
+            },
             CreatePricelist: function () {
                 var popup = new Ext.Window({
-                    width: 308,
-                    height: 240,
+                    width: 420,
+                    height: 235,
                     title: 'Create Pricelist',
-                    layout: 'fit',
-                    plain: true,
+                    icon: 'res/icons/table_add.png',
                     items: {
                         xtype: 'form',
-                        layout: {
-                            type: 'vbox',
-                            align: 'stretch'
-                        },
+                        layout: { type: 'vbox', align: 'stretch' },
                         border: false,
                         bodyPadding: 10,
-                        fieldDefaults: {
-                            labelAlign: 'top',
-                            labelWidth: 100,
-                            labelStyle: 'font-weight:bold'
-                        },
-                        defaults: {
-                            margins: '0 0 10 0'
-                        },
+                        fieldDefaults: { labelWidth: 100 },
                         items: [
                                 {
                                     xtype: "textfield",
@@ -210,7 +359,6 @@
                                 {
                                     xtype: "checkbox",
                                     fieldLabel: "Public Pricelist",
-                                    boxLabel: "Public",
                                     name: 'IsPublic'
                                 },
                                 {
@@ -225,6 +373,7 @@
                         buttons: [
                             {
                                 text: 'Create',
+                                formBind:true,
                                 handler: function () {
                                     Ext.Ajax.request({
                                         url: 'QuoteService.svc/CreatePricelist',
@@ -237,6 +386,7 @@
                                     });
                                 }
                             }
+                            //,{ text:'?',handler : function () { alert ( this.ownerCt.ownerCt.ownerCt.width + " x " + this.ownerCt.ownerCt.ownerCt.height ) ; } } 
                         ]
                     }
                 });
@@ -249,7 +399,7 @@
                     id: 'pricelists-grid',
                     flex: 1,
                     title: 'Pricelists',
-                    iconCls: 'icon-trigger',
+                    icon: 'res/icons/table.png',
                     store: 'PricelistsStore',
                     border: false,
                     stripeRows: true,
@@ -284,15 +434,17 @@
                         items: [{
                             text: 'Add',
                             scope: this,
-                            iconCls: 'icon-add-trigger',
+                            icon: 'res/icons/table_add.png',
                             handler: this.CreatePricelist
                         }, {
                             text: 'Delete',
                             scope: this,
-                            iconCls: 'icon-delete-trigger'
-                        }, '-',
+                            icon: 'res/icons/table_delete.png',
+                            handler: this.DeletePricelist
+                        }, { xtype: 'tbfill' },
                         {
                             text: 'Clear Selection',
+                            icon: 'res/icons/bullet_white.png',
                             handler: function () {
                                 this.ownerCt.ownerCt.getSelectionModel().deselectAll();
                             }
@@ -316,16 +468,9 @@
                         xtype: 'container',
                         region: 'center',
                         layout: 'border',
-                        defaults: {
-                            border: false
-                        },
                         items: [{
                             region: 'west',
-                            width: "20%",
-                            minWidth: 150,
-                            maxWidth: 400,
-                            split: true,
-                            collapsible: false,
+                            flex: 1,
                             layout: {
                                 type: 'vbox',
                                 align: 'stretch',
@@ -334,42 +479,15 @@
                             items: Ext.create('Pricing.ProductLinePortlet')
                         }, {
                             region: 'center',
-                            layout: {
-                                type: 'fit'
-                            },
-                            items: [
-                                {
-                                    layout: {
-                                        type: 'vbox',
-                                        align: 'stretch',
-                                        pack: 'start'
-                                    },
-                                    items: [
-                                        Ext.create('Pricing.ProductPortlet')
-                                    ]
-                                }]
+                            flex:1,
+                            layout: 'fit',
+                            items: Ext.create('Pricing.ProductPortlet')
                         },
                         {
                             region: 'east',
-                            width: "55%",
+                            flex:1,
                             layout: 'fit',
-                            minWidth: 250,
-                            split: true,
-                            resizable: true,
-                            items: [{
-                                layout: {
-                                    type: 'vbox',
-                                    align: 'stretch',
-                                    pack: 'start'
-                                },
-                                defaults: {
-                                    border: false
-                                },
-                                items: [
-                                    Ext.create('Pricing.PricelistPortlet')
-                                   // Ext.create('Cloud.ErrorLogPortlet')
-                                ]
-                            }]
+                            items: Ext.create('Pricing.PricelistPortlet')
                         }]
                     }]
                 });

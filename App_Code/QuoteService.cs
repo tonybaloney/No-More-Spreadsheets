@@ -75,6 +75,49 @@ public class QuoteService
         p.OwnerId = OwnerId; 
         p.Currency = Currency;
         p.Date = DateTime.Now;
-        p.Create();
+        Pricelist new_p = p.Create();
+        foreach ( string productLineId in ProductLines.Split(',')){
+            p.AttachProductLine(Convert.ToInt32(productLineId));
+        }
+    }
+
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void DeletePricelist(int Id)
+    {
+        Pricelist.Delete(Id);
+    }
+
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void DeleteProduct(int Id)
+    {
+        Product.Delete(Id);
+    }
+
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void DeleteProductLine(int Id)
+    {
+        ProductLine.Delete(Id);
+    }
+
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void CreateProduct( string Title, string Group, string Subgroup, string Partcode, string Manufacturer, string Description, string InternalNotes, string Availability, string ProductLines ) {
+        Product p = new Product();
+        p.Title = Title;
+        p.Group = Group;
+        p.SubGroup = Subgroup;
+        p.Partcode = Partcode;
+        p.Manufacturer = Manufacturer;
+        p.Description = Description;
+        p.InternalNotes = InternalNotes;
+        p.Availability = Availability;
+        Product newProduct = p.Create();
+        foreach (string productLineId in ProductLines.Split(','))
+        {
+            newProduct.AttachProductLine(Convert.ToInt32(productLineId));
+        }
     }
 }
