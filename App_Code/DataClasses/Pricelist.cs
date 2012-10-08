@@ -63,6 +63,16 @@ namespace com.ashaw.pricing {
         }
 
         /// <summary>
+        /// Saves this instance.
+        /// </summary>
+        public void Save()
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            db.RunScalarCommand(new System.Data.SqlClient.SqlCommand(this.GetSaveSQL(this.Id, "Pricelists")));
+            db.Dispose();
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Pricelist" /> class.
         /// </summary>
         public Pricelist()

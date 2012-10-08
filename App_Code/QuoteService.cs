@@ -66,10 +66,21 @@ public class QuoteService
 
     [OperationContract]
     [WebInvoke(Method = "POST")]
-    public void CreatePricelist(string Title, int OwnerId, string ProductLines, string Currency, string IsPublic)
+    public void SaveProductLine(int Id, string Name, string Description, string ProductManager)
+    {
+        ProductLine p = new ProductLine(Id);
+        p.Name = Name;
+        p.Description = Description;
+        p.ProductManager = ProductManager;
+        p.Save();
+    }
+
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void CreatePricelist(string Name, int OwnerId, string ProductLines, string Currency, string IsPublic)
     {
         Pricelist p = new Pricelist();
-        p.Name = Title;
+        p.Name = Name;
         p.IsDefault = false;
         p.IsPrivate = (IsPublic != "on" ); 
         p.OwnerId = OwnerId; 
@@ -77,6 +88,24 @@ public class QuoteService
         p.Date = DateTime.Now;
         Pricelist new_p = p.Create();
         foreach ( string productLineId in ProductLines.Split(',')){
+            p.AttachProductLine(Convert.ToInt32(productLineId));
+        }
+    }
+
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void SavePricelist(int Id, string Name, int OwnerId, string ProductLines, string Currency, string IsPublic)
+    {
+        Pricelist p = new Pricelist(Id);
+        p.Name = Name;
+        p.IsDefault = false;
+        p.IsPrivate = (IsPublic != "on");
+        p.OwnerId = OwnerId;
+        p.Currency = Currency;
+        p.Date = DateTime.Now;
+        p.Save();
+        foreach (string productLineId in ProductLines.Split(','))
+        {
             p.AttachProductLine(Convert.ToInt32(productLineId));
         }
     }

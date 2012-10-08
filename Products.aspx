@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="Products.aspx.cs" Inherits="Products" %>
+﻿<%@ Page Title="Product Management View" Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="Products.aspx.cs" Inherits="Products"  %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server" >
 </asp:Content>
@@ -32,11 +32,11 @@
                     });
                 }
             },
-            CreateProductLine: function () {
+            CreateProductLine: function (s,e,existing) {
                var popup = new Ext.Window({
                     width: 308,
-                    height: 240,
-                    title: 'Create Product Line',
+                    height: 260,
+                    title: (existing?'Edit Product Line':'Create Product Line'),
                     layout: 'fit',
                     plain: true,
                     items: {
@@ -55,40 +55,47 @@
                         defaults: {
                             margins: '0 0 10 0'
                         },
-                        url: 'QuoteService.svc/CreateProductLine',
                         items: [
+                            { 
+                                xtype: 'hidden',
+                                name: 'Id',
+                                value: (existing?existing.data.Id:false)
+                            },
                             {
                                 xtype: 'textfield',
                                 name: 'Name',
                                 fieldLabel: 'Name',
-                                allowBlank: false
+                                allowBlank: false,
+                                value: (existing?existing.data.Name:'')
                             },
                             {
                                 xtype: 'textfield',
                                 name: 'Description',
                                 fieldLabel: 'Description',
-                                allowBlank: false
+                                allowBlank: false,
+                                value: (existing?existing.data.Description:'')
                             },
                             {
                                 xtype: 'textfield',
                                 name: 'ProductManager',
                                 fieldLabel: 'Product Manager',
-                                allowBlank: true
+                                allowBlank: true,
+                                value: (existing?existing.data.ProductManager:'')
                             }
                         ],
                         buttons: [
                             {
-                                text: 'Create',
+                                text: (existing?'Save':'Create'),
                                 formBind: true,
                                 handler: function () {
                                     Ext.Ajax.request({
-                                        url: 'QuoteService.svc/CreateProductLine',
+                                        url: (existing?'QuoteService.svc/SaveProductLine':'QuoteService.svc/CreateProductLine'),
                                         jsonData: this.up('form').getForm().getValues(),
                                         success: function () {
                                             Ext.getStore('ProductLinesStore').load();
                                             popup.destroy();
                                         },
-                                        failure: function () { alert('Error closing quote'); }
+                                        failure: function (msg) { alert('Error creating/editing product line - '+msg); }
                                     });
                                 }
                             }
@@ -113,8 +120,15 @@
                         text: 'Name',
                         flex: 1,
                         sortable: true,
-                        dataIndex: 'Name'
-                    }],
+                        dataIndex: 'Name',
+                        xtype: 'templatecolumn',
+                        tpl: '<h2>{Name}</h2> {Description}'
+                    }, {
+                        text: 'Product Manager',
+                        width: 100,
+                        dataIndex: 'ProductManager'
+                    }
+                    ],
                     dockedItems: [{
                         xtype: 'toolbar',
                         items: [{
@@ -127,7 +141,12 @@
                             scope: this,
                             icon: 'res/icons/package_delete.png',
                             handler: this.DeleteProductLine
-                        }, { xtype: 'tbfill' },
+                        },{
+                            text: 'Edit',
+                            scope: this,
+                            icon: 'res/icons/package_green.png',
+                            handler: function () { this.CreateProductLine(this,null,(this.selModel.selected.length > 0 ? this.selModel.selected.items[0] : null)); }
+                        },{ xtype: 'tbfill' },
                         {
                             text: 'Clear Selection',
                             icon: 'res/icons/bullet_white.png',
@@ -262,11 +281,17 @@
                     columnLines: true,
                     columns: [
                     {
-                        text: 'Title',
-                        flex: 1,
+                        text: 'Product',
+                        flex: 3,
                         sortable: true,
-                        dataIndex: 'Title'
-                        // TODO create template to show all product attributes on row item
+                        dataIndex: 'Title',
+                        xtype: 'templatecolumn', 
+                        tpl: '<h2>{Title}</h2> {Description}'
+                    },
+                    {
+                        text: 'Availability',
+                        width: 100,
+                        dataIndex: 'Availability'
                     }],
                     dockedItems: [{
                         xtype: 'toolbar',
@@ -320,12 +345,12 @@
                     });
                 }
             },
-            CreatePricelist: function () {
+            CreatePricelist: function (e,b,existing) {
                 var popup = new Ext.Window({
                     width: 420,
                     height: 235,
-                    title: 'Create Pricelist',
-                    icon: 'res/icons/table_add.png',
+                    title: (existing?'Edit Pricelist':'Create Pricelist'),
+                    icon: (existing?'res/icons/table_add.png':'res/icons/table_add.png'),
                     items: {
                         xtype: 'form',
                         layout: { type: 'vbox', align: 'stretch' },
@@ -333,10 +358,16 @@
                         bodyPadding: 10,
                         fieldDefaults: { labelWidth: 100 },
                         items: [
+                                { 
+                                    xtype: 'hidden',
+                                    name: 'Id',
+                                    value: (existing?existing.data.Id:0)
+                                },
                                 {
                                     xtype: "textfield",
-                                    fieldLabel: "Title",
-                                    name: 'Title'
+                                    fieldLabel: "Name",
+                                    name: 'Name',
+                                    value: (existing?existing.data.Name:"")
                                 },
                                 {
                                     xtype: "combo",
@@ -346,7 +377,8 @@
                                     displayField: 'RealName',
                                     hiddenName: 'pricelistowner',
                                     editable: false,
-                                    name: 'OwnerId'
+                                    name: 'OwnerId',
+                                    value: (existing?existing.data.OwnerId:'')
                                 }, {
                                     xtype: "multiselect",
                                     fieldLabel: "Product Lines",
@@ -354,12 +386,14 @@
                                     valueField: 'Id',
                                     displayField: 'Name',
                                     name: 'ProductLines',
-                                    multiSelect: true
+                                    multiSelect: true,
+                                    value: (existing?existing.data.ProductLines:'')
                                 },
                                 {
                                     xtype: "checkbox",
                                     fieldLabel: "Public Pricelist",
-                                    name: 'IsPublic'
+                                    name: 'IsPublic',
+                                    value: (existing?existing.data.IsPublic:false)
                                 },
                                 {
                                     xtype: "combo",
@@ -367,7 +401,8 @@
                                     name: 'Currency',
                                     store: ['GBP', 'AUD', 'USD', 'EUR'],
                                     selectOnFocus: true,
-                                    allowBlank: false
+                                    allowBlank: false,
+                                    value: (existing ? existing.data.Currency : 'USD')
                                 }
                             ],
                         buttons: [
@@ -376,7 +411,7 @@
                                 formBind:true,
                                 handler: function () {
                                     Ext.Ajax.request({
-                                        url: 'QuoteService.svc/CreatePricelist',
+                                        url: (existing?'QuoteService.svc/SavePricelist':'QuoteService.svc/CreatePricelist'),
                                         jsonData: this.up('form').getForm().getValues(),
                                         success: function () {
                                             Ext.getStore('PricelistsStore').load();
@@ -436,6 +471,12 @@
                             scope: this,
                             icon: 'res/icons/table_add.png',
                             handler: this.CreatePricelist
+                        },
+                        {
+                            text: 'Edit',
+                            scope: this,
+                            icon: 'res/icons/table_edit.png',
+                            handler: function () { this.CreatePricelist(this,null,(this.selModel.selected.length > 0 ? this.selModel.selected.items[0] : null)); }
                         }, {
                             text: 'Delete',
                             scope: this,

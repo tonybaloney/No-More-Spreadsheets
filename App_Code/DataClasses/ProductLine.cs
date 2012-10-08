@@ -15,6 +15,12 @@ public class ProductLine : DataObject
 	}
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="ProductLine" /> class.
+    /// </summary>
+    /// <param name="id">The id.</param>
+    public ProductLine(int id) : base(id, "GetProductLine") { }
+
+    /// <summary>
     /// Deletes the specified pricelist id.
     /// </summary>
     /// <param name="ProductLineId">The product line id.</param>
@@ -41,6 +47,16 @@ public class ProductLine : DataObject
         DatabaseConnection db = new DatabaseConnection();
         System.Data.SqlClient.SqlCommand com = new System.Data.SqlClient.SqlCommand(this.GetInsertSQL("ProductLines"));
         db.RunScalarCommand(com);
+        db.Dispose();
+    }
+
+    /// <summary>
+    /// Saves this instance.
+    /// </summary>
+    public void Save()
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        db.RunScalarCommand(new System.Data.SqlClient.SqlCommand(this.GetSaveSQL(this.Id, "ProductLines")));
         db.Dispose();
     }
 
