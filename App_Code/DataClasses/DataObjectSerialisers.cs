@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Web.Script.Serialization;
 
 namespace com.ashaw.pricing
 {
@@ -46,7 +47,13 @@ namespace com.ashaw.pricing
                 foreach (DataField df in fields)
                 {
                     object val = o.GetType().GetProperty(df.FieldName).GetValue(o);
-                    javascript += df.jsonFieldName + ":'"+ (val == null?"null":val.ToString()) + "'";
+                    if (df.FieldType.IsArray)
+                    {
+                        JavaScriptSerializer jsl = new JavaScriptSerializer();
+                        javascript +=  df.jsonFieldName + ": " + jsl.Serialize(val);
+                    }
+                    else
+                        javascript += df.jsonFieldName + ":'" + (val == null ? "null" : val.ToString()) + "'";
                     if (fields[fields.Count - 1] != df) javascript += ","; // If this is not the last, add a comma
                 }
                 javascript += "}";
@@ -93,7 +100,7 @@ namespace com.ashaw.pricing
                 case "DateTime": t = "date";
                     break;
                 default:
-                    t = "string";
+                    t = "auto";
                     break;
             }
             return t;
@@ -174,7 +181,8 @@ namespace com.ashaw.pricing
             foreach (DataField field in DataObjectSerialisers.GetFields(to))
             {
                 // Find the equivalent from field and set the value.
-                t.GetProperty(field.FieldName).SetValue(to, t.GetProperty(field.FieldName).GetValue(from));
+                if (!field.readonlyfield)
+                    t.GetProperty(field.FieldName).SetValue(to, t.GetProperty(field.FieldName).GetValue(from));
             }
         }
     }

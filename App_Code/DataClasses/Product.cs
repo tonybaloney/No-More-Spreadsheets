@@ -54,24 +54,34 @@ namespace com.ashaw.pricing
         }
 
         /// <summary>
-        /// Attaches the product line to the pricelist
-        /// </summary>
-        /// <param name="ProductId">The product id.</param>
-        /// <param name="ProductLineId">The product line id.</param>
-        static public void AttachProductLine(int ProductId, int ProductLineId)
-        {
-            DatabaseConnection db = new DatabaseConnection();
-            db.SProc("AttachProductLineToProduct", new KeyValuePair<string, object>("@ProductId", ProductId), new KeyValuePair<string, object>("@ProductLineId", ProductLineId));
-            db.Dispose();
-        }
-
-        /// <summary>
         /// Attaches the product line to this pricelist
         /// </summary>
         /// <param name="ProductLineId">The product line id.</param>
         public void AttachProductLine(int ProductLineId)
         {
-            Product.AttachProductLine(this.Id, ProductLineId);
+            DatabaseConnection db = new DatabaseConnection();
+            db.SProc("AttachProductLineToProduct", new KeyValuePair<string, object>("@ProductId", this.Id), new KeyValuePair<string, object>("@ProductLineId", ProductLineId));
+            db.Dispose();
+        }
+
+        /// <summary>
+        /// Deletes all product line links for this product
+        /// </summary>
+        public void ClearProductLines()
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            db.SProc("ClearProductsProductLinesLinks", new KeyValuePair<string, object>("@ProductId", this.Id));
+            db.Dispose();
+        }
+
+        /// <summary>
+        /// Saves this instance.
+        /// </summary>
+        public void Save()
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            db.RunScalarCommand(new System.Data.SqlClient.SqlCommand(this.GetSaveSQL(this.Id, "Products")));
+            db.Dispose();
         }
 
         /// <summary>
@@ -154,5 +164,21 @@ namespace com.ashaw.pricing
         /// </value>
         [DataField("Manufacturer")]
         public string Manufacturer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the product lines.
+        /// </summary>
+        /// <value>
+        /// The product lines.
+        /// </value>
+        [DataField("ProductLines", true)]
+        public int[] ProductLines { 
+            get {
+                DatabaseConnection db = new DatabaseConnection();
+                int[] me = db.SProcToIntList("GetProductProductLinesLinks", new KeyValuePair<string, object>("@Id", this.Id));
+                db.Dispose();
+                return me;
+            }
+        } 
     }
 }

@@ -104,6 +104,7 @@ public class QuoteService
         p.Currency = Currency;
         p.Date = DateTime.Now;
         p.Save();
+        p.ClearProductLines();
         foreach (string productLineId in ProductLines.Split(','))
         {
             p.AttachProductLine(Convert.ToInt32(productLineId));
@@ -133,11 +134,11 @@ public class QuoteService
 
     [OperationContract]
     [WebInvoke(Method = "POST")]
-    public void CreateProduct( string Title, string Group, string Subgroup, string Partcode, string Manufacturer, string Description, string InternalNotes, string Availability, string ProductLines ) {
+    public void CreateProduct( string Title, string Group, string SubGroup, string Partcode, string Manufacturer, string Description, string InternalNotes, string Availability, string ProductLines ) {
         Product p = new Product();
         p.Title = Title;
         p.Group = Group;
-        p.SubGroup = Subgroup;
+        p.SubGroup = SubGroup;
         p.Partcode = Partcode;
         p.Manufacturer = Manufacturer;
         p.Description = Description;
@@ -147,6 +148,26 @@ public class QuoteService
         foreach (string productLineId in ProductLines.Split(','))
         {
             newProduct.AttachProductLine(Convert.ToInt32(productLineId));
+        }
+    }
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void SaveProduct(int Id, string Title, string Group, string SubGroup, string Partcode, string Manufacturer, string Description, string InternalNotes, string Availability, string ProductLines)
+    {
+        Product p = new Product(Id);
+        p.Title = Title;
+        p.Group = Group;
+        p.SubGroup = SubGroup;
+        p.Partcode = Partcode;
+        p.Manufacturer = Manufacturer;
+        p.Description = Description;
+        p.InternalNotes = InternalNotes;
+        p.Availability = Availability;
+        p.Save();
+        p.ClearProductLines();
+        foreach (string productLineId in ProductLines.Split(','))
+        {
+            p.AttachProductLine(Convert.ToInt32(productLineId));
         }
     }
 }

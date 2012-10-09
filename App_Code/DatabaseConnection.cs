@@ -100,6 +100,36 @@ namespace com.ashaw.pricing
         }
 
         /// <summary>
+        /// Ss the proc to object list.
+        /// </summary>
+        /// <param name="sProcName">Name of the s proc.</param>
+        /// <param name="sProcParams">The s proc params.</param>
+        /// <returns></returns>
+        public int[] SProcToIntList(string sProcName, params KeyValuePair<string, object>[] sProcParams)
+        {
+            List<int> results = new List<int>();
+
+            // Call the stored procedure with the parameters.
+            SqlCommand command = new SqlCommand();
+            command.Connection = this.sqlConnection;
+            if (command.Connection.State != ConnectionState.Open) command.Connection.Open();
+            foreach (KeyValuePair<string, object> kvp in sProcParams)
+            {
+                command.Parameters.Add(new SqlParameter(kvp.Key, kvp.Value));
+            }
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandText = sProcName;
+
+            SqlDataReader sdr = command.ExecuteReader();
+            // Go through each row.
+            while (sdr.Read())
+            {
+                results.Add(sdr.GetInt32(0));
+            }
+            return results.ToArray();
+        }
+
+        /// <summary>
         /// Run a stored procedure that returns a scalar and return the resulting object.
         /// </summary>
         /// <param name="sProcName">Name of the s proc.</param>

@@ -42,6 +42,16 @@ namespace com.ashaw.pricing {
         }
 
         /// <summary>
+        /// Deletes all product line links for this pricelist
+        /// </summary>
+        public void ClearProductLines()
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            db.SProc("ClearPricelistsProductLinesLinks", new KeyValuePair<string, object>("@PricelistId", this.Id));
+            db.Dispose();
+        }
+
+        /// <summary>
         /// Attaches the product line to the pricelist
         /// </summary>
         /// <param name="PricelistId">The pricelist id.</param>
@@ -160,5 +170,23 @@ namespace com.ashaw.pricing {
         /// </value>
         [DataField("OwnerName", true)]
         public string OwnerName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the product lines.
+        /// </summary>
+        /// <value>
+        /// The product lines.
+        /// </value>
+        [DataField("ProductLines", true)]
+        public int[] ProductLines
+        {
+            get
+            {
+                DatabaseConnection db = new DatabaseConnection();
+                int[] me = db.SProcToIntList("GetPricelistProductLinesLinks", new KeyValuePair<string, object>("@Id", this.Id));
+                db.Dispose();
+                return me;
+            }
+        } 
     }
 }

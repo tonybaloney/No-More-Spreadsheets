@@ -177,12 +177,12 @@
                     });
                 }
             },
-            CreateProduct: function () {
+            CreateProduct: function (e,b,existing) {
                 var popup = new Ext.Window({
                     width: 420,
                     height: 540,
-                    title: 'Create Product',
-                    icon: 'res/icons/brick_add.png',
+                    title: (existing?'Edit Product':'Create Product'),
+                    icon: (existing?'res/icons/brick_edit.png':'res/icons/brick_add.png'),
                     items: {
                         xtype: 'form',
                         layout: { type: 'vbox', align: 'stretch' },
@@ -191,39 +191,51 @@
                         fieldDefaults: { labelWidth: 100 },
                         items: [
                                 {
+                                    xtype: "hidden",
+                                    name: "Id",
+                                    value: (existing?existing.data.Id:0)
+                                },
+                                {
                                     xtype: "textfield",
                                     fieldLabel: "Title",
-                                    name: 'Title'
+                                    name: 'Title',
+                                    value: (existing?existing.data.Title:'')
                                 },
                                 {
                                     xtype: "textfield",
                                     fieldLabel: "Group",
-                                    name: 'Group'
+                                    name: 'Group',
+                                    value: (existing?existing.data.Group:'')
                                 },
                                 {
                                     xtype: "textfield",
-                                    fieldLabel: "Subgroup",
-                                    name: 'Subgroup'
+                                    fieldLabel: "SubGroup",
+                                    name: 'SubGroup',
+                                    value: (existing?existing.data.SubGroup:'')
                                 },
                                 {
                                     xtype: "textfield",
                                     fieldLabel: "Partcode",
-                                    name: 'Partcode'
+                                    name: 'Partcode',
+                                    value: (existing?existing.data.Partcode:'')
                                 },
                                 {
                                     xtype: "textfield",
                                     fieldLabel: "Manufacturer",
-                                    name: 'Manufacturer'
+                                    name: 'Manufacturer',
+                                    value: (existing?existing.data.Manufacturer:'')
                                 },
                                 {
                                     xtype: "textareafield",
                                     fieldLabel: "Description",
-                                    name: 'Description'
+                                    name: 'Description',
+                                    value: (existing?existing.data.Description:'')
                                 },
                                 {
                                     xtype: "textareafield",
                                     fieldLabel: "Internal Notes",
-                                    name: 'InternalNotes'
+                                    name: 'InternalNotes',
+                                    value: (existing?existing.data.InternalNotes:'')
                                 },
                                 {
                                     xtype: "combo",
@@ -231,7 +243,8 @@
                                     name: 'Availability',
                                     store: ['available','out of stock','on hold','end of sale','end of life'],
                                     selectOnFocus: true,
-                                    allowBlank: false
+                                    allowBlank: false,
+                                    value: (existing?existing.data.Availability:'')
                                 },
                                  {
                                      xtype: "multiselect",
@@ -242,26 +255,27 @@
                                      valueField: 'Id',
                                      displayField: 'Name',
                                      name: 'ProductLines',
-                                     multiSelect: true
+                                     multiSelect: true,
+                                     value: (existing?existing.data.ProductLines:'')
                                  }
                         ],
                         buttons: [
                             {
-                                text: 'Create',
+                                text: (existing?'Save':'Create'),
                                 formBind: true,
                                 handler: function () {
                                     Ext.Ajax.request({
-                                        url: 'QuoteService.svc/CreateProduct',
+                                        url: (existing?'QuoteService.svc/SaveProduct':'QuoteService.svc/CreateProduct'),
                                         jsonData: this.up('form').getForm().getValues(),
                                         success: function () {
                                             Ext.getStore('ProductsStore').load();
                                             popup.destroy();
                                         },
-                                        failure: function () { alert('Error creating product.'); }
+                                        failure: function () { alert('Error creating/saving product.'); }
                                     });
                                 }
                             }
-                            ,{ text:'?',handler : function () { alert ( this.ownerCt.ownerCt.ownerCt.width + " x " + this.ownerCt.ownerCt.ownerCt.height ) ; } } 
+                            //,{ text:'?',handler : function () { alert ( this.ownerCt.ownerCt.ownerCt.width + " x " + this.ownerCt.ownerCt.ownerCt.height ) ; } } 
                         ]
                     }
                 });
@@ -300,6 +314,11 @@
                             scope: this,
                             icon: 'res/icons/brick_add.png',
                             handler:  this.CreateProduct
+                        }, {
+                            text: 'Edit',
+                            scope: this,
+                            icon: 'res/icons/brick_edit.png',
+                            handler: function () { this.CreateProduct(this, null, (this.selModel.selected.length > 0 ? this.selModel.selected.items[0] : null)); }
                         }, {
                             text: 'Delete',
                             scope: this,
