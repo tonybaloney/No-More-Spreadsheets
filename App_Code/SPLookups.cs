@@ -53,6 +53,13 @@ namespace com.ashaw.pricing
                     type = typeof(Package);
                     results = db.SProcToObjectList(type, "GetPackagesInProductLine", new KeyValuePair<string, object>("@ProductLineId", Convert.ToInt32(Request.Params["ProductLineId"])));
                     break;
+                case "PackageComponents":
+                    type = typeof(Package);
+                    if (String.IsNullOrEmpty(Request.Params["PackageId"]))
+                        results = new List<object>();
+                    else
+                        results = db.SProcToObjectList(type, "PackageComponentsInPackage", new KeyValuePair<string, object>("@PackageId", Convert.ToInt32(Request.Params["PackageId"])));
+                    break;
             }
             db.Dispose();
             return DataObjectSerialisers.GetJson(results);

@@ -54,6 +54,8 @@ namespace com.ashaw.pricing
                     return new QuoteItem();
                 case "ProductLines":
                     return new ProductLine();
+                case "PackageComponents":
+                    return new PackageComponent();
                 default:
                     throw new TypeAccessException("Type (" + name + ") not recognised.");
             }

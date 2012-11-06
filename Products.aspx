@@ -7,6 +7,7 @@
     <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Products" ></script>
     <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=ProductLines" ></script>
     <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=Users" ></script>
+    <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=PackageComponents" ></script>
     <script type="text/javascript">
         Ext.Loader.setConfig({ enabled: true });
         Ext.Loader.setPath('Ext.ux', 'ext/examples/ux');
@@ -181,6 +182,7 @@
                 var popup = new Ext.Window({
                     width: 420,
                     height: 540,
+                    constrain: true,
                     title: (existing?'Edit Product':'Create Product'),
                     icon: (existing?'res/icons/brick_edit.png':'res/icons/brick_add.png'),
                     items: {
@@ -282,6 +284,242 @@
                 popup.show(this);
                 popup.center();
             },
+            CreatePackage: function (e, b, existing) {
+                var popup = new Ext.Window({
+                    width: 420,
+                    height: 540,
+                    constrain: true,
+                    maximizable: true,
+                    title: (existing ? 'Edit Package' : 'Create Package'),
+                    icon: (existing ? 'res/icons/briefcase.png' : 'res/icons/briefcase.png'),
+                    items: 
+                        {
+                            xtype:'tabpanel',
+                            layout: {type: 'vbox', align: 'stretch'},
+                            items: [
+                            {
+                                xtype: 'form',
+                                title: 'Options',
+                                layout: { type: 'vbox', align: 'stretch' },
+                                border: false,
+                                bodyPadding: 10,
+                                fieldDefaults: { labelWidth: 100 },
+                                items: [
+                                        {
+                                            xtype: "hidden",
+                                            name: "Id",
+                                            value: (existing ? existing.data.Id : 0)
+                                        },
+                                        {
+                                            xtype: "textfield",
+                                            fieldLabel: "Title",
+                                            name: 'Title',
+                                            value: (existing ? existing.data.Title : '')
+                                        },
+                                        {
+                                            xtype: "checkbox",
+                                            fieldLabel: "Configurable",
+                                            name: 'Configurable',
+                                            value: (existing ? existing.data.Configurable : '')
+                                        },
+                                        {
+                                            xtype:'fieldset',
+                                            checkboxToggle:true,
+                                            title: 'Use package pricing',
+                                            value: (existing ? existing.data.InheritPrice : ''),
+                                            checkboxName: 'InheritPrice',
+                                            defaultType: 'numberfield',
+                                            collapsed: true,
+                                            layout: 'anchor',
+                                            defaults: {
+                                                anchor: '100%'
+                                            },
+                                            items :[{
+                                                fieldLabel: 'Setup Price',
+                                                name: 'SetupPrice',
+                                                allowBlank:false
+                                            },{
+                                                fieldLabel: 'Recurring Price',
+                                                name: 'RecurringPrice',
+                                                allowBlank:false
+                                            }]
+                                        },
+                                        {
+                                            xtype: 'fieldset',
+                                            checkboxToggle: true,
+                                            title: 'Use package costing',
+                                            value: (existing ? existing.data.InheritCost : ''),
+                                            checkboxName: 'InheritCost',
+                                            defaultType: 'numberfield',
+                                            collapsed: true,
+                                            layout: 'anchor',
+                                            defaults: {
+                                                anchor: '100%'
+                                            },
+                                            items: [{
+                                                fieldLabel: 'Setup Cost',
+                                                name: 'SetupCost',
+                                                allowBlank: false
+                                            }, {
+                                                fieldLabel: 'Recurring Cost',
+                                                name: 'RecurringCost',
+                                                allowBlank: false
+                                            }]
+                                        },
+                                        {
+                                            xtype: "textfield",
+                                            fieldLabel: "Manufacturer",
+                                            name: 'Manufacturer',
+                                            value: (existing ? existing.data.Manufacturer : '')
+                                        },
+                                        {
+                                            xtype: "textfield",
+                                            fieldLabel: "Partcode",
+                                            name: 'Partcode',
+                                            value: (existing ? existing.data.Partcode : '')
+                                        },
+                                        {
+                                            xtype: "textareafield",
+                                            fieldLabel: "Description Template",
+                                            name: 'DescriptionTemplate',
+                                            value: (existing ? existing.data.DescriptionTemplate : '')
+                                        },
+                                        {
+                                            xtype: "combo",
+                                            fieldLabel: "Availability",
+                                            name: 'Availability',
+                                            store: ['available', 'out of stock', 'on hold', 'end of sale', 'end of life'],
+                                            selectOnFocus: true,
+                                            allowBlank: false,
+                                            value: (existing ? existing.data.Availability : '')
+                                        },
+                                         {
+                                             xtype: "multiselect",
+                                             fieldLabel: "Product Lines",
+                                             store: 'ProductLinesStore',
+                                             minSelections: 1,
+                                             height: 150,
+                                             valueField: 'Id',
+                                             displayField: 'Name',
+                                             name: 'ProductLines',
+                                             multiSelect: true,
+                                             value: (existing ? existing.data.ProductLines : '')
+                                         }
+                                ],
+                                buttons: [
+                                    {
+                                        text: (existing ? 'Save' : 'Create'),
+                                        formBind: true,
+                                        handler: function () {
+                                            Ext.Ajax.request({
+                                                url: (existing ? 'QuoteService.svc/SavePackage' : 'QuoteService.svc/CreatePackage'),
+                                                jsonData: this.up('form').getForm().getValues(),
+                                                success: function () {
+                                                    Ext.getStore('ProductsStore').load();
+                                                    popup.destroy();
+                                                },
+                                                failure: function () { alert('Error creating/saving product.'); }
+                                            });
+                                        }
+                                    }
+                                    //,{ text:'?',handler : function () { alert ( this.ownerCt.ownerCt.ownerCt.width + " x " + this.ownerCt.ownerCt.ownerCt.height ) ; } } 
+                                ]
+                            }, {
+                                xtype: 'gridpanel',
+                                title: 'Components',
+                                store: 'PackageComponentsStore',
+                                dockedItems: [{
+                                    xtype: 'toolbar',
+                                    items: [{
+                                        text: 'Add Component',
+                                        icon: 'res/icons/add.png',
+                                        handler: function (a, b, c) {
+                                            var popup = new Ext.Window({
+                                                width: 420,
+                                                height: 320,
+                                                constrain: true,
+                                                title: (existing ? 'Add Component' : 'Add Component'),
+                                                icon: (existing ? 'res/icons/briefcase.png' : 'res/icons/briefcase.png'),
+                                                items:
+                                                    {
+                                                        xtype: 'form',
+                                                        title: 'Options',
+                                                        layout: { type: 'vbox', align: 'stretch' },
+                                                        border: false,
+                                                        bodyPadding: 10,
+                                                        fieldDefaults: { labelWidth: 100 },
+                                                        items: [
+                                                                {
+                                                                    xtype: "hidden",
+                                                                    name: "PackageId",
+                                                                    value: (existing ? existing.data.PackageId : 0)
+                                                                },
+                                                                {
+                                                                    xtype: "checkbox",
+                                                                    name: "AllowMultiple",
+                                                                    fieldLabel: "Allow Multiple?",
+                                                                    value: (existing ? existing.data.AllowMultiple : 0)
+                                                                },
+                                                                {
+                                                                    xtype: "textfield",
+                                                                    fieldLabel: "Title",
+                                                                    name: 'Title',
+                                                                    value: (existing ? existing.data.Title : '')
+                                                                },
+                                                                {
+                                                                    xtype: "multiselect",
+                                                                    fieldLabel: "Products",
+                                                                    store: 'ProductsStore',
+                                                                    minSelections: 1,
+                                                                    height: 150,
+                                                                    valueField: 'Id',
+                                                                    displayField: 'Name',
+                                                                    name: 'Products',
+                                                                    multiSelect: true,
+                                                                    value: (existing ? existing.data.Products : '')
+                                                                }
+                                                        ],
+                                                        buttons: [
+                                                            {
+                                                                text: (existing ? 'Save' : 'Create'),
+                                                                formBind: true,
+                                                                handler: function () {
+                                                                    Ext.Ajax.request({
+                                                                        url: (existing ? 'QuoteService.svc/SavePackage' : 'QuoteService.svc/CreatePackage'),
+                                                                        jsonData: this.up('form').getForm().getValues(),
+                                                                        success: function () {
+                                                                            Ext.getStore('ProductsStore').load();
+                                                                            popup.destroy();
+                                                                        },
+                                                                        failure: function () { alert('Error creating/saving product.'); }
+                                                                    });
+                                                                }
+                                                            }
+                                                            //,{ text:'?',handler : function () { alert ( this.ownerCt.ownerCt.ownerCt.width + " x " + this.ownerCt.ownerCt.ownerCt.height ) ; } } 
+                                                        ]
+                                                    }
+                                            });
+                                            popup.show(this);
+                                            popup.center();
+                                        }
+                                    }, {
+                                        text: 'Remove Component',
+                                        icon: 'res/icons/delete.png'
+                                    }]
+                                }],
+                                columns: [
+                                    { xtype: 'rownumberer' },
+                                    { header: 'Name', dataIndex: 'Name' },
+                                    { header: 'Multiple', dataIndex: 'Multiple' },
+                                    { header: 'Products', dataIndex: 'ProductChoices', flex: 1 }
+                                ]
+                            }
+                        ]
+                }
+                });
+                popup.show(this);
+                popup.center();
+            },
             initComponent: function () {
                 Ext.apply(this, {
                     height: this.height,
@@ -310,10 +548,15 @@
                     dockedItems: [{
                         xtype: 'toolbar',
                         items: [{
-                            text: 'Add',
+                            text: 'Add Product',
                             scope: this,
                             icon: 'res/icons/brick_add.png',
                             handler:  this.CreateProduct
+                        },{
+                            text: 'Add Package',
+                            scope: this,
+                            icon: 'res/icons/briefcase.png',
+                            handler:  this.CreatePackage
                         }, {
                             text: 'Edit',
                             scope: this,
