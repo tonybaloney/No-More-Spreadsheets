@@ -54,11 +54,11 @@ namespace com.ashaw.pricing
                     results = db.SProcToObjectList(type, "GetPackagesInProductLine", new KeyValuePair<string, object>("@ProductLineId", Convert.ToInt32(Request.Params["ProductLineId"])));
                     break;
                 case "PackageComponents":
-                    type = typeof(Package);
+                    type = typeof(PackageComponent);
                     if (String.IsNullOrEmpty(Request.Params["PackageId"]))
                         results = new List<object>();
                     else
-                        results = db.SProcToObjectList(type, "PackageComponentsInPackage", new KeyValuePair<string, object>("@PackageId", Convert.ToInt32(Request.Params["PackageId"])));
+                        results = db.SProcToObjectList(type, "GetPackageComponentsInPackage", new KeyValuePair<string, object>("@PackageId", Convert.ToInt32(Request.Params["PackageId"])));
                     break;
             }
             db.Dispose();

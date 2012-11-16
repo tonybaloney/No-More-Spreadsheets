@@ -88,7 +88,8 @@ public class QuoteService
         p.Date = DateTime.Now;
         Pricelist new_p = p.Create();
         foreach ( string productLineId in ProductLines.Split(',')){
-            p.AttachProductLine(Convert.ToInt32(productLineId));
+            if (!String.IsNullOrEmpty(productLineId))
+                p.AttachProductLine(Convert.ToInt32(productLineId));
         }
     }
 
@@ -107,7 +108,8 @@ public class QuoteService
         p.ClearProductLines();
         foreach (string productLineId in ProductLines.Split(','))
         {
-            p.AttachProductLine(Convert.ToInt32(productLineId));
+            if (!String.IsNullOrEmpty(productLineId))
+                p.AttachProductLine(Convert.ToInt32(productLineId));
         }
     }
 
@@ -147,7 +149,8 @@ public class QuoteService
         Product newProduct = p.Create();
         foreach (string productLineId in ProductLines.Split(','))
         {
-            newProduct.AttachProductLine(Convert.ToInt32(productLineId));
+            if (!String.IsNullOrEmpty(productLineId))
+             newProduct.AttachProductLine(Convert.ToInt32(productLineId));
         }
     }
     [OperationContract]
@@ -167,7 +170,67 @@ public class QuoteService
         p.ClearProductLines();
         foreach (string productLineId in ProductLines.Split(','))
         {
-            p.AttachProductLine(Convert.ToInt32(productLineId));
+            if (!String.IsNullOrEmpty(productLineId))
+                p.AttachProductLine(Convert.ToInt32(productLineId));
+        }
+    }
+
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void CreatePackage(string Title, string Configurable, string InheritPrice, string InheritCost, string Manufacturer, string Partcode, string DescriptionTemplate, string Availability,string ProductLines)
+    {
+        Package p = new Package();
+        p.Title = Title;
+        p.Configurable = (Configurable=="on");
+        p.InheritPrice = (InheritPrice=="on");
+        p.InheritCost = (InheritCost=="on");
+        p.Manufacturer = Manufacturer;
+        p.Partcode = Partcode;
+        p.DescriptionTemplate = DescriptionTemplate;
+        p.Availability = Availability;
+        Package newProduct = p.Create();
+        foreach (string productLineId in ProductLines.Split(','))
+        {
+            if (!String.IsNullOrEmpty(productLineId))
+                newProduct.AttachProductLine(Convert.ToInt32(productLineId));
+        }
+    }
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void SavePackage(int Id, string Title, string Configurable, string InheritPrice, string InheritCost, string Manufacturer, string Partcode, string DescriptionTemplate, string Availability, string ProductLines)
+    {
+        Package p = new Package(Id);
+        p.Title = Title;
+        p.Configurable = (Configurable=="on");
+        p.InheritPrice = (InheritPrice=="on");
+        p.InheritCost = (InheritCost=="on");   
+        p.Manufacturer = Manufacturer;
+        p.Partcode = Partcode;
+        p.DescriptionTemplate = DescriptionTemplate;
+        p.Availability = Availability;
+        p.Save();
+        p.ClearProductLines();
+        foreach (string productLineId in ProductLines.Split(','))
+        {
+            if (!String.IsNullOrEmpty(productLineId))
+                p.AttachProductLine(Convert.ToInt32(productLineId));
+        }
+    }
+
+    [OperationContract]
+    [WebInvoke(Method = "POST")]
+    public void SavePackageComponents(int OwningPackageId, PackageComponent[] Components)
+    {
+        Package package = new Package(OwningPackageId);
+        package.ClearPackageComponents();
+        foreach (PackageComponent c in Components)
+        {
+            c.PackageId = OwningPackageId;
+            PackageComponent newComponent = c.Create();
+            // Attach the products
+            foreach (string productId in c.ProductsString.Split(','))
+                if (!String.IsNullOrEmpty(productId))
+                    newComponent.AttachProduct(Convert.ToInt32(productId));
         }
     }
 }

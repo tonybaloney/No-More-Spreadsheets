@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using com.ashaw.pricing;
 
 /// <summary>
@@ -9,6 +10,74 @@ public class Package : DataObject
 	public Package()
 	{
 	}
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Product" /> class.
+    /// </summary>
+    /// <param name="Id">The id.</param>
+    public Package(int Id) : base(Id, "GetPackage") { }
+
+    /// <summary>
+    /// Attaches the product line to this pricelist
+    /// </summary>
+    /// <param name="ProductLineId">The product line id.</param>
+    public void AttachProductLine(int ProductLineId)
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        db.SProc("AttachProductLineToPackage", new KeyValuePair<string, object>("@PackageId", this.Id), new KeyValuePair<string, object>("@ProductLineId", ProductLineId));
+        db.Dispose();
+    }
+
+    /// <summary>
+    /// Deletes all product line links for this product
+    /// </summary>
+    public void ClearProductLines()
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        db.SProc("ClearPackagesProductLinesLinks", new KeyValuePair<string, object>("@PackageId", this.Id));
+        db.Dispose();
+    }
+
+    public void ClearPackageComponents()
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        db.SProc("ClearPackagePackageComponents", new KeyValuePair<string, object>("@PackageId", this.Id));
+        db.Dispose();
+    }
+
+    /// <summary>
+    /// Creates this instance.
+    /// </summary>
+    public Package Create()
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        System.Data.SqlClient.SqlCommand com = new System.Data.SqlClient.SqlCommand(this.GetInsertSQL("Packages"));
+        db.RunScalarCommand(com);
+        Package p = new Package(db.GetIdentity());
+        db.Dispose();
+        return p;
+    }
+
+    /// <summary>
+    /// Deletes the specified package id.
+    /// </summary>
+    /// <param name="ProductId">The product id.</param>
+    public static void Delete(int ProductId)
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        db.SProc("DeletePackage", new KeyValuePair<string, object>("@Id", ProductId));
+        db.Dispose();
+    }
+
+    /// <summary>
+    /// Saves this instance.
+    /// </summary>
+    public void Save()
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        db.RunScalarCommand(new System.Data.SqlClient.SqlCommand(this.GetSaveSQL(this.Id, "Packages")));
+        db.Dispose();
+    }
 
     /// <summary>
     /// Gets or sets the id.
@@ -82,40 +151,25 @@ public class Package : DataObject
     [DataField("Partcode")]
     public string Partcode { get; set; }
 
-    /// <summary>
-    /// Gets or sets the recurring price.
-    /// </summary>
-    /// <value>
-    /// The recurring price.
-    /// </value>
-    [DataField("RecurringPrice")]
-    public double RecurringPrice { get; set; }
+    [DataField("Availability")]
+    public string Availability { get; set; }
 
     /// <summary>
-    /// Gets or sets the setup price.
+    /// Gets or sets the product lines.
     /// </summary>
     /// <value>
-    /// The setup price.
+    /// The product lines.
     /// </value>
-    [DataField("SetupPrice")]
-    public double SetupPrice { get; set; }
-
-    /// <summary>
-    /// Gets or sets the setup cost.
-    /// </summary>
-    /// <value>
-    /// The setup cost.
-    /// </value>
-    [DataField("SetupCost")]
-    public double SetupCost { get; set; }
-
-    /// <summary>
-    /// Gets or sets the recurring cost.
-    /// </summary>
-    /// <value>
-    /// The recurring cost.
-    /// </value>
-    [DataField("RecurringCost")]
-    public double RecurringCost { get; set; }
+    [DataField("ProductLines", true)]
+    public int[] ProductLines
+    {
+        get
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            int[] me = db.SProcToIntList("GetPackageProductLinesLinks", new KeyValuePair<string, object>("@Id", this.Id));
+            db.Dispose();
+            return me;
+        }
+    } 
 
 }

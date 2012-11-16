@@ -53,7 +53,7 @@ namespace com.ashaw.pricing
                         javascript +=  df.jsonFieldName + ": " + jsl.Serialize(val);
                     }
                     else
-                        javascript += df.jsonFieldName + ":'" + (val == null ? "null" : val.ToString()) + "'";
+                        javascript += df.jsonFieldName + ":'" + (val == null ? "null" : val.ToString().Trim()) + "'";
                     if (fields[fields.Count - 1] != df) javascript += ","; // If this is not the last, add a comma
                 }
                 javascript += "}";

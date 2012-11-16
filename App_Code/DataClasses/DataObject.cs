@@ -56,6 +56,8 @@ namespace com.ashaw.pricing
                     return new ProductLine();
                 case "PackageComponents":
                     return new PackageComponent();
+                case "Packages":
+                    return new Package();
                 default:
                     throw new TypeAccessException("Type (" + name + ") not recognised.");
             }
