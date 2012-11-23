@@ -46,8 +46,10 @@ namespace com.ashaw.pricing
                     return new User();
                 case "Pricelists":
                     return new Pricelist();
-                case "ProductsToQuote":
-                    return new Product();
+                case "PricedProducts":
+                    return new PricedProduct();
+                case "PricedPackages":
+                    return new PricedProduct();
                 case "Products":
                     return new Product();
                 case "QuoteItems":

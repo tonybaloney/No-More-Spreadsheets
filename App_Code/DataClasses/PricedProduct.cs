@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace com.ashaw.pricing
 {
@@ -10,20 +7,6 @@ namespace com.ashaw.pricing
     /// </summary>
     public class PricedProduct : Product
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Product" /> class.
-        /// </summary>
-        public PricedProduct() { }
-
-        /// <summary>
-        /// Gets or sets the id.
-        /// </summary>
-        /// <value>
-        /// The id.
-        /// </value>
-        [DataField("Id")]
-        public int Id { get; set; }
-
         /// <summary>
         /// Gets or sets the pricelist id.
         /// </summary>

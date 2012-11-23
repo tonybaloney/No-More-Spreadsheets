@@ -3,14 +3,12 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
 <script type="text/javascript" src="ext/examples/ux/RowExpander.js"></script>
-<script type="text/javascript" src="ext/examples/shared/examples.js"></script>
-<link rel="stylesheet" type="text/css" href="ext/examples/shared/example.css" />
-<script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=ProductsToQuote&QuoteId=<%=this.quoteId %>" ></script>
+<script type="text/javascript" src="Data.aspx?view=Model&model=PricedProducts" ></script>
+<script type="text/javascript" src="Data.aspx?view=Model&model=PricedPackages" ></script>
 <script type="text/javascript" src="Data.aspx?view=ExtModelAndStore&model=QuoteItems&QuoteId=<%=this.quoteId %>" ></script>
 <script type="text/javascript" src="pricing/js/Dialogs.js"></script>
 <link rel="stylesheet" type="text/css" href="ext/icon_packs/fugue/css/fugue-pack.css" />
 <script type="text/javascript">
-    Ext.BLANK_IMAGE_URL = '/ext/resources/images/default/s.gif';
     Ext.onReady(function(){
         /**
          * Get the cost of the record
@@ -21,14 +19,10 @@
         }
 
         function ProductDescription (val, b, record){
-            var desc= "<b>"+val+ "</b><br/>"+record.data.qi_description;
-            if ( record.data.qi_notes != null && record.data.qi_notes!='' && record.data.qi_notes!='<br>' ) 
-                desc +="<br/><b>Notes:</b><br/>"+record.data.qi_notes;
+            var desc= "<b>"+val+ "</b><br/>"+record.data.Description;
+            if ( record.data.Notes != null && record.data.Notes!='' && record.data.Notes!='<br>' ) 
+                desc +="<br/><b>Notes:</b><br/>"+record.data.Notes;
             return desc;
-        }
-
-        function priceSetup(val,b,record){
-            return Ext.util.Format.currency (parseFloat(record.data.pli_setupprice))+ "/" + Ext.util.Format.currency (parseFloat(record.data.pli_recurringprice));
         }
 
         /**  
@@ -602,8 +596,8 @@
             var quoteStatus = '';
             Ext.Ajax.request({
                 url: 'SaveQuote.aspx',
-                success: function(){ Ext.example.msg('Save quote', 'Quote saved successfully'); },
-                failure: function(){ Ext.example.msg('Error', 'Failed to Save Quote'); },
+                success: function(){ Ext.Msg.alert('Save quote', 'Quote saved successfully'); },
+                failure: function(){ Ext.Msg.alert('Error', 'Failed to Save Quote'); },
                 params: { 
                     quote_items: data_string, 
                     quote_id: <%=this.quoteId%>, 
@@ -797,10 +791,10 @@
             columns: [
 			    {id:'Quantity',header: 'Qty', width: 30, sortable: false, dataIndex: 'Quantity'},
 			    {id:'Title',header: 'Item', width: 150, sortable: false, dataIndex: 'Title', renderer : ProductDescription, flex:1},
-			    {header: 'Unit Setup Price', width: 90, sortable: false,  dataIndex: 'SetupPrice', renderer: Ext.util.Format.currency},
-			    {header: 'Setup Price', width: 90, sortable: false,  dataIndex: 'TotalSetupPrice', renderer: Ext.util.Format.currency},
-			    {header: 'Unit Price', width: 90, sortable:false, dataIndex: 'RecurringPrice', renderer: Ext.util.Format.currency},
-			    {header: 'Price', width: 90, sortable: false, dataIndex: 'TotalRecurringPrice', renderer: Ext.util.Format.currency},
+			    {header: 'Unit Setup Price', width: 90, sortable: false,  dataIndex: 'SetupPrice', renderer: Ext.util.Format.numberRenderer('0.00')},
+			    {header: 'Setup Price', width: 90, sortable: false,  dataIndex: 'TotalSetupPrice', renderer: Ext.util.Format.numberRenderer('0.00')},
+			    {header: 'Unit Price', width: 90, sortable:false, dataIndex: 'RecurringPrice', renderer: Ext.util.Format.numberRenderer('0.00')},
+			    {header: 'Price', width: 90, sortable: false, dataIndex: 'TotalRecurringPrice', renderer: Ext.util.Format.numberRenderer('0.00')},
 			    {id:'RecurringCost',header: 'Cost', width: 90, sortable:false, dataIndex: 'RecurringCost', renderer: InternalCostRenderer}
             ],
             selModel: new Ext.selection.RowModel({ mode: 'MULTI' }),
@@ -867,55 +861,39 @@
                                 ]
                             });
                             menu.showAt(xy);
+                        },
+                        drop: function(node, data, dropRec, dropPosition) {
+                            var selectedRecord = data.records[0];
+                            AddProductRecord(selectedRecord);
                         }
                 },
                 getRowClass: function(record, rowIndex, rp, ds){ 
                     if(record.data.IsPart) return 'x-hidden';
                     else return '';
+                },
+                plugins: {
+                    ptype: 'gridviewdragdrop',
+                    dropGroup: 'quoteItemsDrop',
+                    enableDrag:false
                 }
             }
         });
 
-        var componentGrid = new Ext.grid.GridPanel({
+        var componentGrid = new Ext.panel.Panel({
+            layout:'accordion',
             region: 'west',
-            store: 'ProductsToQuoteStore',
-            enableDragDrop: true,
             width: 300,
             minSize: 200,
             maxSize: 600,
-            region: 'west',
-            columns : [
-			    {id:'Id',header: 'PID', width: 0, sortable: true, dataIndex: 'Id', hidden: true},
-			    {id:'Title',header: 'Title',flex:1, sortable: true, dataIndex: 'Title'},
-			    {id:'RecurringPrice',header: 'Setup/Price', width: 90, sortable: true, dataIndex: 'RecurringPrice', renderer: priceSetup},
-			    {id:'SetupPrice',header: 'Setup Price', width: 90, sortable: true, dataIndex: 'SetupPrice', renderer: Ext.util.Format.currency, hidden: true},
-			    {id:'Description',header: 'Desc', width: 90, sortable: true, dataIndex: 'Description', hidden: true},
-			    {id:'Group',header: 'Group', width: 0, sortable: true, dataIndex: 'Group', hidden: true}
-            ],
-            stripeRows       : false,
-            autoExpandColumn : 'Title',
             tbar: [
 			    {xtype:'textfield', flex:1, id:'search-field',enableKeyEvents:true, listeners: { keyup: function(f,e) { SearchProduct(Ext.getCmp('search-field').getValue());} } },
 			    {xtype:'button', iconCls:'icon-fugue-funnel', handler: function() { SearchProduct(Ext.getCmp('search-field').getValue()); } },
 			    {xtype:'button', iconCls:'icon-fugue-cross', handler: function(){ ClearSearchProduct();Ext.getCmp('search-field').setValue(''); } } 
             ],
-            singleSelect : true,
-            features: [
-			    Ext.create('Ext.grid.feature.Grouping',{
-			        groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
-			    })
-            ],
-            viewConfig: {
-                plugins: {
-                    ptype: 'gridviewdragdrop',
-                    ddGroup:'gridDDGroup',
-                    enableDrop:false
-                },
-                listeners : { 
-                    itemdblclick :function(view,record){
-                        AddProductRecord(record);
-                    }
-                }
+            loader: {
+                url: 'QuoteService.svc/QuotePanelComponents?QuoteId=<%=this.quoteId%>',
+                renderer: 'component',
+                autoLoad: true
             }
         });
         var totalsPanel = new Ext.FormPanel({ 
@@ -1147,11 +1125,10 @@
             ],
             renderTo: document.body
         });
-        // Drag and drop code
-        // This will make sure we only drop to the view container
+
         var formPanelDropTargetEl =  quoteItemsGrid.body.dom;
         var formPanelDropTarget = Ext.create('Ext.dd.DropTarget',formPanelDropTargetEl, {
-            ddGroup     : 'gridDDGroup',
+            ddGroup     : 'quoteItemsDDGroup',
             notifyEnter : function(ddSource, e, data) {	
                 //Add some flare to invite drop.
                 quoteItemsGrid.body.stopAnimation();
@@ -1160,28 +1137,33 @@
             notifyDrop  : function(ddSource, e, data){
                 // Dropping products into the quote
                 var selectedRecord = ddSource.dragData.records[0];
-                AddProductRecord(selectedRecord);
+                if (data.view.panel.modelType == "PricedProducts") // add generic product
+                    AddProductRecord(selectedRecord);
+                else if (data.view.panel.modelType == "PricedPackages") // package editor
+                    PackageWizard ( selectedRecord ) ;
             }
         });
+
         function AddProductRecord(selectedRecord){
+            var d = selectedRecord.data;
             var newQuoteItemRecord = Ext.ModelManager.create(
 		    {
 		        Id: null,
 		        QuoteId: parseInt(<%=this.quoteId%>),
-		        ProductId: parseInt(selectedRecord.data['Id']),
-		        Title: selectedRecord.data['Title'],
-		        Description: (selectedRecord.data['Description']?selectedRecord.data['Description']:''),
+		        ProductId: parseInt(d.Id),
+		        Title: d.Title,
+		        Description: (d.Description?d.Description:''),
 		        Quantity: 1,
-		        SetupPrice: parseFloat(selectedRecord.data['SetupPrice']),
-		        RecurringPrice: parseFloat(selectedRecord.data['RecurringPrice']),
-		        TotalRecurringPrice: parseFloat(selectedRecord.data['RecurringPrice']),
-		        TotalSetupPrice: parseFloat(selectedRecord.data['SetupPrice']),
-		        SetupCost: parseFloat(selectedRecord.data['SetupCost']),
-		        RecurringCost: parseFloat(selectedRecord.data['RecurringCost']),
-		        GroupName: selectedRecord.data['Group'],
-                SubGroup: selectedRecord.data['SubGroup'],
-		        Index: GetNextIndexInGroup( selectedRecord.data['Group'] ),
-		        Partcode: selectedRecord.data['Partcode'],
+		        SetupPrice: parseFloat(d.SetupPrice),
+		        RecurringPrice: parseFloat(d.RecurringPrice),
+		        TotalRecurringPrice: parseFloat(d.RecurringPrice),
+		        TotalSetupPrice: parseFloat(d.SetupPrice),
+		        SetupCost: parseFloat(d.SetupCost),
+		        RecurringCost: parseFloat(d.RecurringCost),
+		        GroupName: d.Group,
+                SubGroup: d.SubGroup,
+		        Index: GetNextIndexInGroup( d.Group ),
+		        Partcode: d.Partcode,
 		        IsBundle: false,
 		        IsPart: false,
 		        BundleId: 0
@@ -1190,6 +1172,9 @@
             Ext.data.StoreManager.lookup('QuoteItemsStore').add(newQuoteItemRecord);
             recalculateTotals();
             return true;
+        }
+        function PackageWizard (selectedRecord){
+
         }
         // Setup keyboard shortcuts
         new Ext.KeyMap(document, {key: 'q',shift: true,ctrl:true,stopEvent:true,	fn: ChangeQuantity});

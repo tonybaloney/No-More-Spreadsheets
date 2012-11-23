@@ -16,6 +16,9 @@ public partial class Data : System.Web.UI.Page
             if (!String.IsNullOrEmpty(Request.Params["view"] )){
                 string view = Request.Params["view"];
                 switch ( view ) {
+                    case "Model":
+                        Response.Write(DataObjectSerialisers.GetExtJsonModel(DataObject.GetDataClass(model),model));
+                        break;
                     case "ExtModelAndStore": 
                         object mod = DataObject.GetDataClass(model);
                         string extra ="";

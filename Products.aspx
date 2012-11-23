@@ -115,7 +115,6 @@
                     icon: 'res/icons/package.png',
                     store: 'ProductLinesStore',
                     border: false,
-                    stripeRows: true,
                     columnLines: true,
                     columns: [
                     {
@@ -294,7 +293,6 @@
                     icon: 'res/icons/brick.png',
                     store: 'ProductsStore',
                     border: false,
-                    stripeRows: true,
                     columnLines: true,
                     columns: [
                     {
@@ -605,7 +603,6 @@
                     icon: 'res/icons/briefcase.png',
                     store: 'PackagesStore',
                     border: false,
-                    stripeRows: true,
                     columnLines: true,
                     columns: [
                     {
@@ -770,7 +767,6 @@
                     icon: 'res/icons/table.png',
                     store: 'PricelistsStore',
                     border: false,
-                    stripeRows: true,
                     columnLines: true,
                     columns: [
                     {

@@ -242,6 +242,9 @@ namespace com.ashaw.pricing
         [DataField("LastChanged","q_last_change")]
         public DateTime LastChange { get; set; }
 
+        [DataField("PricelistId")]
+        public int PricelistId { get; set; } 
+
         /// <summary>
         /// Gets or sets the name of the pricelist.
         /// </summary>
@@ -295,5 +298,9 @@ namespace com.ashaw.pricing
         /// </value>
         [DataField("CreatedDate", "q_created_date")]
         public DateTime CreatedDate { get; set; }
+
+        [DataField("ContractLengthMonths")]
+        public int ContractLengthMonths { get;set ;}
+
     }
 }
