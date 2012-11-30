@@ -65,8 +65,8 @@ namespace com.ashaw.pricing
         /// <param name="sProcName">Name of the s proc.</param>
         /// <param name="sProcParams">The s proc params.</param>
         /// <returns></returns>
-        public List<object> SProcToObjectList ( Type resultType, string sProcName, params KeyValuePair<string,object>[] sProcParams ) {
-            List<object> results = new List<object>();
+        public List<DataObject> SProcToObjectList ( Type resultType, string sProcName, params KeyValuePair<string,object>[] sProcParams ) {
+            List<DataObject> results = new List<DataObject>();
 
             // Call the stored procedure with the parameters.
             SqlCommand command = new SqlCommand();

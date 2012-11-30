@@ -1174,7 +1174,31 @@
             return true;
         }
         function PackageWizard (selectedRecord){
-
+            Ext.create('Ext.window.Window', {
+                width: 668,
+                title: "Package",
+                height:257,
+                items : [
+                {
+                    xtype: "form",
+                    height: 226,
+                    frame: true,
+                    hideBorders: true,
+                    loader: {
+                        url: 'QuoteService.svc/PackageComponents?PackageId='+selectedRecord.data.Id,
+                        renderer: 'component',
+                        autoLoad: true
+                    },
+                    buttons: [{
+                        text : 'Add Package',
+                        handler : function(){
+                            // process text value and close...
+                            // process options
+                            this.ownerCt.ownerCt.ownerCt.hide();
+                        }
+                    }]
+                }]
+            }).show();
         }
         // Setup keyboard shortcuts
         new Ext.KeyMap(document, {key: 'q',shift: true,ctrl:true,stopEvent:true,	fn: ChangeQuantity});

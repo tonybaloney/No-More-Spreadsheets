@@ -23,7 +23,7 @@ namespace com.ashaw.pricing
         public DataObject(int id, string getSProc)
         {
             DatabaseConnection db = new DatabaseConnection();
-            List<object> me = db.SProcToObjectList(this.GetType(),getSProc, new KeyValuePair<string,object>("@Id",id));
+            List<DataObject> me = db.SProcToObjectList(this.GetType(),getSProc, new KeyValuePair<string,object>("@Id",id));
             db.Dispose();
             DataObjectSerialisers.Copy(me[0], this);
         }

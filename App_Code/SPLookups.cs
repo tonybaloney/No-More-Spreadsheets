@@ -12,7 +12,7 @@ namespace com.ashaw.pricing
         static public string GetDataView(string model,HttpRequest Request)
         {
             DatabaseConnection db = new DatabaseConnection();
-            List<object> results = new List<object>();
+            List<DataObject> results = new List<DataObject>();
             Type type;
             switch (model)
             {
@@ -64,7 +64,7 @@ namespace com.ashaw.pricing
                 case "PackageComponents":
                     type = typeof(PackageComponent);
                     if (String.IsNullOrEmpty(Request.Params["PackageId"]))
-                        results = new List<object>();
+                        results = new List<DataObject>();
                     else
                         results = db.SProcToObjectList(type, "GetPackageComponentsInPackage", new KeyValuePair<string, object>("@PackageId", Convert.ToInt32(Request.Params["PackageId"])));
                     break;

@@ -36,10 +36,10 @@ namespace com.ashaw.pricing
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
-        static public string GetJson(List<object> data)
+        static public string GetJson(List<DataObject> data)
         {
             string javascript = "[";
-            foreach (object o in data)
+            foreach (DataObject o in data)
             {
                 List<DataField> fields = DataObjectSerialisers.GetFields(o);
                 javascript += "{";
@@ -143,12 +143,12 @@ namespace com.ashaw.pricing
             return fieldList;
         }
 
-        static public object TranslateKVPsToObjects(List<KeyValuePair<string, object>> row, Type targetType)
+        static public DataObject TranslateKVPsToObjects(List<KeyValuePair<string, object>> row, Type targetType)
         {
             List<DataField> fields = DataObjectSerialisers.GetFields(targetType);
             // Get the target object constructor
             ConstructorInfo constructorInfo = targetType.GetConstructor(new Type[0]);
-            object newObject = constructorInfo.Invoke(new object[0]);
+            DataObject newObject = (DataObject)constructorInfo.Invoke(new DataObject[0]);
 
             foreach (KeyValuePair<string, object> kvp in row)
             {

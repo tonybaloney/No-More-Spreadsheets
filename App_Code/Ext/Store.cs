@@ -5,8 +5,13 @@ using System.Runtime.Serialization;
 /// Summary description for Store
 /// </summary>
 [DataContract]
+[KnownType(typeof(SimpleStore))]
+[KnownType(typeof(SimplePackageComponentStore))]
 public class Store
 {
+    public Store()
+    {
+    }
 	public Store(string model, Proxy proxy)
 	{
         this.autoLoad = true;

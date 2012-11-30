@@ -170,6 +170,20 @@ public class Package : DataObject
             db.Dispose();
             return me;
         }
-    } 
+    }
 
+    [DataField("Components", true)]
+    public PackageComponent[] Components
+    {
+        get
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            Type t = typeof(PackageComponent);
+            List<PackageComponent> components = new List<PackageComponent>();
+            List<DataObject> results = db.SProcToObjectList(t, "GetPackageComponentsInPackage", new KeyValuePair<string, object>("@PackageId", this.Id));
+            foreach (DataObject res in results)
+                components.Add((PackageComponent)res);
+            return components.ToArray();
+        }
+    }
 }
