@@ -284,23 +284,32 @@ public class QuoteService
 
     [OperationContract]
     [WebGet(ResponseFormat = WebMessageFormat.Json)]
-    public ComboBox[] PackageComponents(int PackageId)
+    public ComponentComboBox[] PackageComponents(int PackageId, int PricelistId)
     {
         // Get the package
-        List<ComboBox> results = new List<ComboBox>();
+        List<ComponentComboBox> results = new List<ComponentComboBox>();
         Package package = new Package(PackageId);
         if (package != null)
         {
             foreach (PackageComponent com in package.Components)
             {
-                ComboBox combo = new ComboBox();
+                ComponentComboBox combo = new ComponentComboBox();
                 combo.fieldLabel = com.Title;
                 SimplePackageComponentStore store = new SimplePackageComponentStore();
-                List<Product> products = new List<Product>();
+                List<PricedProduct> products = new List<PricedProduct>();
                 foreach (int pId in com.Products)
-                    products.Add(new Product(pId));
+                {
+                    Product p = new Product(pId);
+                    try
+                    {
+                        products.Add(p.Price(PricelistId));
+                    }
+                    catch (Product.PricingException)
+                    {
+                        // dont add, probably doesn't exist in the pricelist.
+                    }
+                }
                 store.data = products.ToArray();
-                store.fields = new String[]{"Id","Title"};
                 combo.valueField = "Id";
                 combo.displayField = "Title";
                 combo.store = store;

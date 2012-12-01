@@ -83,6 +83,23 @@ namespace com.ashaw.pricing
             db.RunScalarCommand(new System.Data.SqlClient.SqlCommand(this.GetSaveSQL(this.Id, "Products")));
             db.Dispose();
         }
+        public class PricingException : Exception
+        {
+            public PricingException(string message) : base(message) { }
+        }
+        public PricedProduct Price(int PricelistId)
+        {
+            DatabaseConnection db = new DatabaseConnection();
+            List<DataObject> res = db.SProcToObjectList(typeof(PricedProduct),"GetPricedProduct", new KeyValuePair<string, object>("@ProductId", this.Id), new KeyValuePair<string, object>("@PricelistId", PricelistId));
+            if (res.Count >0 && res[0].GetType() == typeof( PricedProduct) )
+            {
+                return (PricedProduct)res[0];
+            }
+            else
+            {
+                throw new PricingException("Product not priced in this pricelist");
+            }
+        }
 
         /// <summary>
         /// Gets or sets the id.

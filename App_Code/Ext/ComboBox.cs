@@ -11,8 +11,21 @@ public class ComboBox :ExtComponent
         this.queryMode = "local";
     }
     public string fieldLabel { get; set; }
-    public Store store { get; set; } 
+    public SimpleStore store { get; set; } 
     public string queryMode { get; set; } 
     public string displayField { get; set; } 
     public string valueField {get; set ;} 
+}
+public class ComponentComboBox : ExtComponent
+{
+    public ComponentComboBox()
+    {
+        this.xtype = "combobox";
+        this.queryMode = "local";
+    }
+    public string fieldLabel { get; set; }
+    public string queryMode { get; set; } 
+    public string displayField { get; set; } 
+    public string valueField {get; set ;} 
+    public SimplePackageComponentStore store { get; set; } 
 }

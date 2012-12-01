@@ -1174,6 +1174,7 @@
             return true;
         }
         function PackageWizard (selectedRecord){
+            var d = selectedRecord.data;
             Ext.create('Ext.window.Window', {
                 width: 668,
                 title: "Package",
@@ -1185,20 +1186,46 @@
                     frame: true,
                     hideBorders: true,
                     loader: {
-                        url: 'QuoteService.svc/PackageComponents?PackageId='+selectedRecord.data.Id,
+                        url: 'QuoteService.svc/PackageComponents?PackageId='+selectedRecord.data.Id+'&PricelistId=<%=this.quote.PricelistId%>',
                         renderer: 'component',
                         autoLoad: true
                     },
                     buttons: [{
                         text : 'Add Package',
                         handler : function(){
-                            // process text value and close...
+                            var form = this.ownerCt.ownerCt;
+                            var newQuoteItemRecord = Ext.ModelManager.create(
+		                    {
+		                        Id: null,
+		                        QuoteId: parseInt(<%=this.quoteId%>),
+		                        ProductId: parseInt(d.Id),
+		                        Title: d.Title,
+		                        Description: (d.Description?d.Description:''),
+		                        Quantity: 1,
+		                        SetupPrice: parseFloat(d.SetupPrice),
+		                        RecurringPrice: parseFloat(d.RecurringPrice),
+		                        TotalRecurringPrice: parseFloat(d.RecurringPrice),
+		                        TotalSetupPrice: parseFloat(d.SetupPrice),
+		                        SetupCost: parseFloat(d.SetupCost),
+		                        RecurringCost: parseFloat(d.RecurringCost),
+		                        GroupName: d.Group,
+		                        SubGroup: d.SubGroup,
+		                        Index: GetNextIndexInGroup( d.Group ),
+		                        Partcode: d.Partcode,
+		                        IsBundle: false,
+		                        IsPart: false,
+		                        BundleId: 0
+		                    }, 'QuoteItems'
+		                    );
+                            Ext.data.StoreManager.lookup('QuoteItemsStore').add(newQuoteItemRecord);
+                            recalculateTotals();
                             // process options
                             this.ownerCt.ownerCt.ownerCt.hide();
                         }
                     }]
                 }]
             }).show();
+            return true;
         }
         // Setup keyboard shortcuts
         new Ext.KeyMap(document, {key: 'q',shift: true,ctrl:true,stopEvent:true,	fn: ChangeQuantity});
