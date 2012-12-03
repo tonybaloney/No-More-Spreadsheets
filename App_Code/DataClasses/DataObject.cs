@@ -49,7 +49,7 @@ namespace com.ashaw.pricing
                 case "PricedProducts":
                     return new PricedProduct();
                 case "PricedPackages":
-                    return new PricedProduct();
+                    return new PricedPackage();
                 case "Products":
                     return new Product();
                 case "QuoteItems":
@@ -134,6 +134,12 @@ namespace com.ashaw.pricing
                             valuesSql += " NULL ";
                         else
                             valuesSql += " CAST ( '" + DateTimeToSQLDateTime((DateTime)this.GetType().GetProperty(field.FieldName).GetValue(this)) + "' AS datetime)";
+                    else if (field.FieldType == typeof(bool))
+                        switch (this.GetType().GetProperty(field.FieldName).GetValue(this).ToString())
+                        {
+                            case "True": valuesSql += "1"; break;
+                            case "False": valuesSql += "0"; break;
+                        }
                     else
                         valuesSql += "'" + this.GetType().GetProperty(field.FieldName).GetValue(this).ToString() + "'";
                     if (clearedFields[clearedFields.Count - 1] != field)

@@ -40,28 +40,7 @@
         function GetNumSelectedQuoteItems(){
             return quoteItemsGrid.selModel.selected.length;
         }		
-	
-        /** 
-         * Create a unique reference for the bundle id in order to group the bundles together.
-         */
-        function uniqid(){
-            return Math.random() * Math.pow(10, 17) + Math.random() * Math.pow(10, 17) + Math.random() * Math.pow(10, 17) + Math.random() * Math.pow(10, 17) ;
-        }
 	 
-        /**
-         * Build a description of the products with labels
-         * @param parts (array) An array of products
-         * @param labels (array) An array to correlate to the products
-         * @return string
-         */
-        function BuildBundleDescription( parts, labels ){
-            // Build the bundle description
-            var desc='';
-            for (var i in parts)
-                desc += labels[i]+": "+parts[i].Title+"<br>";
-            return desc;
-        }
-
         /**
          * Add up the cost and price of an array of products
          * @param parts (array) Array of product records
@@ -76,119 +55,6 @@
                 totalCost.setupprice += parseFloat(parts[i].SetupPrice);
             }
             return totalCost;
-        }
-		
-        /**
-         * Save the bundle configuration window into a quote
-         * @param owner (window) The owning window in which to fetch the form results
-         * @return null
-         */
-        function SaveBundle (owner) {
-            var form = owner.ownerCt.ownerCt;
-            var name = form.getForm().findField("name").getValue();
-            var chassis_record = form.getComponent('chassis').valueModels[0].data;
-            var products=new Array();
-            var labels=new Array();
-            var keys=new Array();
-            for ( var i in form.items.items ) {
-                if ( form.items.items[i].alternateClassName=='Ext.form.ComboBox' ) { // is a drop-down
-                    var cmp = form.items.items[i];
-                    if (cmp.value !=null && cmp.valueModels.length > 0) {	
-                        products.push(cmp.valueModels[0].data);
-                        labels.push(cmp.fieldLabel);
-                        keys.push(cmp.itemId);
-                    }
-                }
-            }
-            var bundleDescription = BuildBundleDescription( products, labels );
-					
-            // Calculate Costs
-            var totalCost = AddupCost( products );
-            var bundleConfiguration = {
-                server_name: name,
-                container: chassis_record,
-                parts: products,
-                labels: labels,
-                keys: keys
-            };
-			
-            if (this.ownerCt.ownerCt.ownerCt.qi) { // Has the quote item been set in the window? delete the old data.
-                var record = this.ownerCt.ownerCt.ownerCt.qi;
-                var qid = record.get('Id');
-                // delete the main bundle
-                Ext.data.StoreManager.lookup('QuoteItemsStore').remove(Ext.data.StoreManager.lookup('QuoteItemsStore').find('Id', qid));
-                // delete it's parts
-                while (Ext.data.StoreManager.lookup('QuoteItemsStore').find('BundleId', record.data.BundleId) != -1)
-                    Ext.data.StoreManager.lookup('QuoteItemsStore').removeAt(Ext.data.StoreManager.lookup('QuoteItemsStore').find('BundleId', record.data.BundleId));
-            }
-            // Add the bundle.
-            AddQI ( name, bundleDescription, totalCost, bundleConfiguration );
-            recalculateTotals();
-            // Hide the server config window/
-            owner.ownerCt.ownerCt.ownerCt.hide();
-        }
-
-        /**
-         * Add a quote item to the quote store
-         * new quote items will be saved to the database once the user has chosen save
-         * @param name (string) The name of the new item
-         * @param description (string) The full description of the new item
-         * @param sell_price (json) The prices and costs of the new item
-         * @param configuration (json) The bundle configuration
-         * @return null
-         */
-        function AddQI ( name, description, sell_price, configuration ){
-            var bundleid = uniqid();
-            var newQuoteItemRecord = Ext.ModelManager.create(
-                {
-                    Id: null,
-                    ProductId: configuration.container.ProductId,
-                    Title: name,
-                    Description: description,
-                    Quantity: 1,
-                    SetupPrice: sell_price.setupprice,
-                    RecurringPrice: sell_price.recurringprice,
-                    TotalRecurringPrice: sell_price.recurringprice,
-                    TotalSetupPrice: sell_price.setupprice,
-                    SetupCost: sell_price.setupcost,
-                    RecurringCost: sell_price.recurringcost,
-                    GroupName: 'Bundles',
-                    PartCode: configuration.container.PartCode,
-                    Notes: '',
-                    IsBundle: true,
-                    IsPart: false,
-                    BundleId: bundleid
-                }, 'QuoteItems'
-            );
-            Ext.data.StoreManager.lookup('QuoteItemsStore').add(newQuoteItemRecord);
-            for (var i in configuration.parts)
-            {
-                var selectedRecord =configuration.parts[i];
-                var newQuoteItemRecord = Ext.ModelManager.create(
-                    {
-                        Id: null,
-                        ProductId: parseInt(selectedRecord.Id),
-                        Title: selectedRecord.Title,
-                        Description: selectedRecord.Description,
-                        Quantity: 1,
-                        SetupPrice: parseFloat(selectedRecord.SetupPrice),
-                        RecurringPrice: parseFloat(selectedRecord.RecurringPrice),
-                        TotalRecurringPrice: parseFloat(selectedRecord.RecurringPrice),
-                        TotalSetupPrice: parseFloat(selectedRecord.SetupPrice),
-                        SetupCost: parseFloat(selectedRecord.SetupCost),
-                        RecurringCost: parseFloat(selectedRecord.RecurringCost),
-                        GroupName: 'Parts',
-                        SubGroup: configuration.keys[i],
-                        Index: 0,
-                        PartCode: selectedRecord.PartCode,
-                        Notes: '',
-                        IsBundle: false,
-                        IsPart: true,
-                        BundleId: bundleid
-                    }, 'QuoteItems'
-                );
-                Ext.data.StoreManager.lookup('QuoteItemsStore').add(newQuoteItemRecord);
-            }
         }
 	
         /**
@@ -222,7 +88,7 @@
             var totalSetupPrice = 0.0;
 		
             for (var i = 0; i< Ext.data.StoreManager.lookup('QuoteItemsStore').data.length; i++){
-                if (Ext.data.StoreManager.lookup('QuoteItemsStore').data.items[i].data.GroupName !=  'Options' && !Ext.data.StoreManager.lookup('QuoteItemsStore').data.items[i].data.IsPart) {
+                if (Ext.data.StoreManager.lookup('QuoteItemsStore').data.items[i].data.GroupName !=  'Options') {
                     totalRecurringPrice+=parseFloat(Ext.data.StoreManager.lookup('QuoteItemsStore').data.items[i].data.TotalRecurringPrice);
                     totalSetupPrice+=parseFloat(Ext.data.StoreManager.lookup('QuoteItemsStore').data.items[i].data.TotalSetupPrice);
                     total12InternalCost+=((parseFloat(Ext.data.StoreManager.lookup('QuoteItemsStore').data.items[i].data.Quantity) * parseFloat(Ext.data.StoreManager.lookup('QuoteItemsStore').data.items[i].data.RecurringCost))*12) + (parseFloat(Ext.data.StoreManager.lookup('QuoteItemsStore').data.items[i].data.Quantity) * parseFloat(Ext.data.StoreManager.lookup('QuoteItemsStore').data.items[i].data.SetupCost));
@@ -618,7 +484,7 @@
          * @return null
          */
         function PrintQuotePDF (){
-            window.location = 'quote.php?mode=print&format=pdf&quoteid=<%=this.quoteId%>';
+            // TODO 
         }
 
 	
@@ -648,10 +514,8 @@
                             TotalSetupPrice: fields.items[11].getValue(),
                             GroupName: fields.items[4].getValue(),
                             PartCode: fields.items[3].getValue(),
-                            IsPart:false,
-                            IsBundle:false,
-                            SubGroup:fields.items[8].getValue(),
-                            BundleId:0
+                            IsPackage:false,
+                            SubGroup:fields.items[8].getValue()
                         }, 'QuoteItems'
                     );
                     Ext.data.StoreManager.lookup('QuoteItemsStore').add(newQuoteItemRecord);
@@ -660,24 +524,6 @@
                 this.ownerCt.ownerCt.ownerCt.hide();
             };
             AddProductDialog(h,true);
-        }
-	
-        /**
-	     * Filter the product store (left hand side) by the user-defined string
-	     * @param s (string) needle
-	     * @return null
-	     */
-        function SearchProduct( s ) {
-            Ext.data.StoreManager.lookup('ProductsToQuoteStore').filter ( 'Title', s, true, false ) ;
-            if (s=='') ClearSearchProduct(); // close all groups if no search
-        }
-	
-        /**
-	     * Clear the product store filter and reset the tree/grid to its default look
-	     * @return null
-	     */
-        function ClearSearchProduct(){
-            Ext.data.StoreManager.lookup('ProductsToQuoteStore').clearFilter();
         }
 	
         /**
@@ -862,14 +708,9 @@
                             });
                             menu.showAt(xy);
                         },
-                        drop: function(node, data, dropRec, dropPosition) {
-                            var selectedRecord = data.records[0];
-                            AddProductRecord(selectedRecord);
+                        drop: function(node, data) {
+                            AddProductRecord(data.records[0]);
                         }
-                },
-                getRowClass: function(record, rowIndex, rp, ds){ 
-                    if(record.data.IsPart) return 'x-hidden';
-                    else return '';
                 },
                 plugins: {
                     ptype: 'gridviewdragdrop',
@@ -1164,9 +1005,7 @@
                 SubGroup: d.SubGroup,
 		        Index: GetNextIndexInGroup( d.Group ),
 		        Partcode: d.Partcode,
-		        IsBundle: false,
-		        IsPart: false,
-		        BundleId: 0
+		        IsPackage: false
 		    }, 'QuoteItems'
 		    );
             Ext.data.StoreManager.lookup('QuoteItemsStore').add(newQuoteItemRecord);
@@ -1194,11 +1033,43 @@
                         text : 'Add Package',
                         handler : function(){
                             var form = this.ownerCt.ownerCt;
+                            var config = new Array();
+                            var setupPrice = 0.0;
+                            var setupCost = 0.0;
+                            var recurringCost = 0.0;
+                            var recurringPrice = 0.0;
+
+                            for (var i = 0 ; i < form.items.length; i++){
+                                if ( form.items.items[i].lastSelection[0] ) {
+                                    var selectedRec = form.items.items[i].lastSelection[0].data ;
+                                    if ( selectedRecord.data.InheritCost )
+                                    {
+                                        setupCost += parseFloat(selectedRec.SetupCost);
+                                        recurringCost += parseFloat(selectedRec.RecurringCost);
+                                    }
+                                    if ( selectedRecord.data.InheritPrice ) 
+                                    {
+                                        setupPrice += parseFloat(selectedRec.setupPrice);
+                                        recurringPrice += parseFloat(selectedRec.RecurringPrice);
+                                    }
+
+                                    config.push( { field: form.items.items[0].fieldLabel, product : selectedRec }  );
+                                }
+                            }
+                            if ( !selectedRecord.data.InheritCost )
+                            {
+                                setupCost = parseFloat(selectedRecord.data.SetupCost);
+                                recurringCost = parseFloat(selectedRecord.data.RecurringCost);
+                            }
+                            if ( !selectedRecord.data.InheritPrice ) 
+                            {
+                                setupPrice = parseFloat(selectedRecord.data.setupPrice);
+                                recurringPrice = parseFloat(selectedRecord.data.RecurringPrice);
+                            }
                             var newQuoteItemRecord = Ext.ModelManager.create(
 		                    {
 		                        Id: null,
 		                        QuoteId: parseInt(<%=this.quoteId%>),
-		                        ProductId: parseInt(d.Id),
 		                        Title: d.Title,
 		                        Description: (d.Description?d.Description:''),
 		                        Quantity: 1,
@@ -1212,9 +1083,10 @@
 		                        SubGroup: d.SubGroup,
 		                        Index: GetNextIndexInGroup( d.Group ),
 		                        Partcode: d.Partcode,
-		                        IsBundle: false,
-		                        IsPart: false,
-		                        BundleId: 0
+		                        IsPackage: true,
+		                        PackageId: parseInt(d.Id),
+		                        PackageConfigJson: Ext.JSON.encode(config),
+                                PackageConfigNative: config
 		                    }, 'QuoteItems'
 		                    );
                             Ext.data.StoreManager.lookup('QuoteItemsStore').add(newQuoteItemRecord);

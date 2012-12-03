@@ -128,8 +128,8 @@ namespace com.ashaw.pricing
         /// <value>
         ///   <c>true</c> if this instance is bundle; otherwise, <c>false</c>.
         /// </value>
-        [DataField("IsBundle")]
-        public bool IsBundle { get; set; }
+        [DataField("IsPackage")]
+        public bool IsPackage { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is part.
@@ -137,8 +137,8 @@ namespace com.ashaw.pricing
         /// <value>
         ///   <c>true</c> if this instance is part; otherwise, <c>false</c>.
         /// </value>
-        [DataField("IsPart")]
-        public bool IsPart { get; set; }
+        [DataField("PackageId")]
+        public bool PackageId { get; set; }
 
         /// <summary>
         /// Gets or sets the bundle id.
@@ -146,8 +146,8 @@ namespace com.ashaw.pricing
         /// <value>
         /// The bundle id.
         /// </value>
-        [DataField("BundleId")]
-        public int BundleId { get; set; }
+        [DataField("PackageConfigJson")]
+        public string PackageConfigJson { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the group.
